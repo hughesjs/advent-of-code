@@ -17,6 +17,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
       - name: Run Cargo Test
-        uses: ./.github/workflows/templates/cargo-test.yml
+        uses: ./.github/workflows/templates/cargo-test
         with:
           TARGET_DIR: $TARGET_DIR

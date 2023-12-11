@@ -1,0 +1,20 @@
+name: Cargo Test
+inputs:
+  target-dir:
+    description: 'Folder to run action against'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+
+    - name: Run tests
+      shell: bash
+      run: cargo test --verbose $TARGET_DIR

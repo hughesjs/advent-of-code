@@ -28,42 +28,60 @@ fn calculate_puzzle(data: &str) -> Result<u16, Box<dyn Error>> {
 }
 
 fn outside_digit_val(buf: &str) -> Result<u16, ParseIntError> {
-    if buf.trim().is_empty() // Skip empty lines
+
+    let mut line = buf.trim().to_string();
+
+    if line.is_empty() // Skip empty lines
     {
         return Ok(0);
     }
 
-    static DIGIT_MAP: phf::Map<&'static str, &'static str> = phf_map! {
-        "one" => "1",
-        "two" => "2",
-        "three" => "3",
-        "four" => "4",
-        "five" => "5",
-        "six" => "6",
-        "seven" => "7",
-        "eight" => "8",
-        "nine" => "9"
+    static DIGIT_MAP: phf::Map<&'static str, char> = phf_map! {
+        "one" => '1',
+        "two" => '2',
+        "three" => '3',
+        "four" => '4',
+        "five" => '5',
+        "six" => '6',
+        "seven" => '7',
+        "eight" => '8',
+        "nine" => '9'
     };
 
-    let mut fixed_line = buf.trim().to_string();
-
-    for fix in DIGIT_MAP.entries() {
-        fixed_line = fixed_line.replace(fix.0, fix.1)
-    }
 
     let mut new_buf: String = String::with_capacity(2);
-    // forward pass
-    for c in buf.chars() {
+
+     // forward pass
+    let mut spelled_buf: String = String::with_capacity(line.len());
+    'outer: for c in line.chars() {
         if c.is_numeric() {
             new_buf.push(c);
             break;
         }
+
+        spelled_buf.push(c);
+        for fix in DIGIT_MAP.entries() {
+            if spelled_buf.contains(fix.0) {
+                new_buf.push(DIGIT_MAP[fix.0]);
+                break 'outer;
+            }
+        }
     }
+
     // backward pass
-    for c in buf.chars().rev() {
+    spelled_buf = String::with_capacity(line.len());
+    'outer: for c in line.chars().rev() {
         if c.is_numeric() {
             new_buf.push(c);
             break;
+        }
+
+        spelled_buf = c.to_string() + &spelled_buf;
+        for fix in DIGIT_MAP.entries() {
+            if spelled_buf.contains(fix.0) {
+                new_buf.push(DIGIT_MAP[fix.0]);
+                break 'outer;
+            }
         }
     }
 
@@ -86,5 +104,15 @@ mod tests {
 
         let res = calculate_puzzle(test_data).unwrap();
         assert_eq!(281, res);
+    }
+
+    # [test]
+    fn test_overlap() {
+        let test_data = r#"
+                            twone
+                            "#;
+
+        let res = calculate_puzzle(test_data).unwrap();
+        assert_eq!(21, res);
     }
 }

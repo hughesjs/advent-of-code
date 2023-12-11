@@ -1,0 +1,23 @@
+name: Test Rust Projects
+
+env:
+  TARGET_DIR: "2023/1-1-trebuchet"
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - $TARGET_DIR
+  pull_request:
+    paths:
+      - $TARGET_DIR
+
+
+
+jobs:
+  test:
+    name: Run Cargo Test
+    uses: .github/workflows/templates/carg-test.yml
+    env:
+      TARGET_DIR: $TARGET_DIR

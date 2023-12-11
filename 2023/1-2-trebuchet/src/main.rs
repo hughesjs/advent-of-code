@@ -3,7 +3,7 @@ use std::fs;
 use std::env::Args;
 use std::num::ParseIntError;
 use std::str::FromStr;
-
+use phf::phf_map;
 fn main() -> Result<(), Box<dyn Error>> {
     let file_path = parse_args(std::env::args())?;
     let data = fs::read_to_string(file_path)?;
@@ -32,6 +32,25 @@ fn outside_digit_val(buf: &str) -> Result<u16, ParseIntError> {
     {
         return Ok(0);
     }
+
+    static DIGIT_MAP: phf::Map<&'static str, &'static str> = phf_map! {
+        "one" => "1",
+        "two" => "2",
+        "three" => "3",
+        "four" => "4",
+        "five" => "5",
+        "six" => "6",
+        "seven" => "7",
+        "eight" => "8",
+        "nine" => "9"
+    };
+
+    let mut fixed_line = buf.trim().to_string();
+
+    for fix in DIGIT_MAP.entries() {
+        fixed_line = fixed_line.replace(fix.0, fix.1)
+    }
+
     let mut new_buf: String = String::with_capacity(2);
     // forward pass
     for c in buf.chars() {

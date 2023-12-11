@@ -11,8 +11,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
-    name: Run Cargo Test
+  - uses: actions/checkout@v3
+  - name: Run Cargo Test
     uses: .github/workflows/templates/cargo-test.yml
     env:
       TARGET_DIR: $TARGET_DIR

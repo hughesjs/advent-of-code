@@ -6,10 +6,10 @@ env:
 on:
   push:
     branches: [ "main" ]
-    paths: ['${{ env.TARGET_DIR }}/**']
+    paths: ['./2023/1-1-trebuchet/**']
   pull_request:
     branches: [ "main" ]
-    paths: ['${{ env.TARGET_DIR }}/**']
+    paths: ['./2023/1-1-trebuchet/**']
   workflow_dispatch:
 
 jobs:

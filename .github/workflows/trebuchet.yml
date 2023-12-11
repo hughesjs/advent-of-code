@@ -5,19 +5,14 @@ env:
 
 on:
   push:
-    branches:
-      - main
-    paths:
-      - $TARGET_DIR
+    branches: [ "main" ]
   pull_request:
-    paths:
-      - $TARGET_DIR
-
-
+    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   test:
     name: Run Cargo Test
-    uses: .github/workflows/templates/carg-test.yml
+    uses: .github/workflows/templates/cargo-test.yml
     env:
       TARGET_DIR: $TARGET_DIR

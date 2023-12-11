@@ -1,0 +1,26 @@
+name: Test Rust Projects
+
+env:
+  TARGET_DIR: './2023/1-1-trebuchet'
+
+on:
+  pull_request:
+    paths:
+      - '2023/1-1-trebuchet/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: 'Build and Test'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - run: echo ${{ env.TARGET_DIR }}
+        shell: bash
+      - run: tree
+        shell: bash
+      - name: Run Cargo Test
+        uses: ./.github/workflows/templates/cargo-test
+        with:
+          target-dir: ${{ env.TARGET_DIR }}

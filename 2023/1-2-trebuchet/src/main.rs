@@ -4,6 +4,7 @@ use std::env::Args;
 use std::num::ParseIntError;
 use std::str::FromStr;
 use phf::phf_map;
+
 fn main() -> Result<(), Box<dyn Error>> {
     let file_path = parse_args(std::env::args())?;
     let data = fs::read_to_string(file_path)?;
@@ -12,8 +13,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn parse_args(mut args: Args) -> Result<String, Box<dyn Error>>{
-    match args.nth(1)     {
+fn parse_args(mut args: Args) -> Result<String, Box<dyn Error>> {
+    match args.nth(1) {
         Some(s) => Ok(s),
         None => Err("No arguments provided".into())
     }
@@ -27,15 +28,7 @@ fn calculate_puzzle(data: &str) -> Result<u16, Box<dyn Error>> {
     return acc;
 }
 
-fn outside_digit_val(buf: &str) -> Result<u16, ParseIntError> {
-
-    let mut line = buf.trim().to_string();
-
-    if line.is_empty() // Skip empty lines
-    {
-        return Ok(0);
-    }
-
+fn get_spelled_num_char_from_buffer(buf: &str) -> Option<char> {
     static DIGIT_MAP: phf::Map<&'static str, char> = phf_map! {
         "one" => '1',
         "two" => '2',
@@ -48,40 +41,51 @@ fn outside_digit_val(buf: &str) -> Result<u16, ParseIntError> {
         "nine" => '9'
     };
 
+    for fix in DIGIT_MAP.entries() {
+        if buf.contains(fix.0) {
+            return Some(DIGIT_MAP[fix.0]);
+        }
+    }
+
+    return None;
+}
+
+fn outside_digit_val(buf: &str) -> Result<u16, ParseIntError> {
+    let mut line = buf.trim().to_string();
+    if line.is_empty() // Skip empty lines
+    {
+        return Ok(0);
+    }
 
     let mut new_buf: String = String::with_capacity(2);
 
-     // forward pass
+    // forward pass
     let mut spelled_buf: String = String::with_capacity(line.len());
-    'outer: for c in line.chars() {
+    for c in line.chars() {
         if c.is_numeric() {
             new_buf.push(c);
             break;
         }
 
         spelled_buf.push(c);
-        for fix in DIGIT_MAP.entries() {
-            if spelled_buf.contains(fix.0) {
-                new_buf.push(DIGIT_MAP[fix.0]);
-                break 'outer;
-            }
+        if let Some(c) = get_spelled_num_char_from_buffer(&spelled_buf) {
+            new_buf.push(c);
+            break;
         }
     }
 
     // backward pass
     spelled_buf = String::with_capacity(line.len());
-    'outer: for c in line.chars().rev() {
+    for c in line.chars().rev() {
         if c.is_numeric() {
             new_buf.push(c);
             break;
         }
 
         spelled_buf = c.to_string() + &spelled_buf;
-        for fix in DIGIT_MAP.entries() {
-            if spelled_buf.contains(fix.0) {
-                new_buf.push(DIGIT_MAP[fix.0]);
-                break 'outer;
-            }
+        if let Some(c) = get_spelled_num_char_from_buffer(&spelled_buf) {
+            new_buf.push(c);
+            break;
         }
     }
 
@@ -90,7 +94,8 @@ fn outside_digit_val(buf: &str) -> Result<u16, ParseIntError> {
 
 mod tests {
     use super::*;
-    # [test]
+
+    #[test]
     fn run_test_data() {
         let test_data = r#"
                             two1nine
@@ -106,7 +111,7 @@ mod tests {
         assert_eq!(281, res);
     }
 
-    # [test]
+    #[test]
     fn test_overlap() {
         let test_data = r#"
                             twone

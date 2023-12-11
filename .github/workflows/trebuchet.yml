@@ -19,4 +19,4 @@ jobs:
       - name: Run Cargo Test
         uses: ./.github/workflows/templates/cargo-test
         with:
-          target-dir: $TARGET_DIR
+          target-dir: ${{ env.TARGET_DIR }}

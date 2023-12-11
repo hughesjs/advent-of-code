@@ -5,7 +5,8 @@ env:
 
 on:
   pull_request:
-    paths: ['./2023/1-1-trebuchet']
+    paths:
+      - './2023/1-1-trebuchet'
   workflow_dispatch:
 
 jobs:

@@ -14,4 +14,5 @@ runs:
 
     - name: Run tests
       shell: bash
-      run: cargo test --verbose ${{ inputs.target-dir }}
+      working-directory: ${{ inputs.target-dir }}
+      run: cargo test --verbose

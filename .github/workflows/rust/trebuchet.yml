@@ -5,15 +5,9 @@ env:
 
 on:
   push:
-    branches:
-      - main
-    paths:
-      - $TARGET_DIR
+    branches: [ "main" ]
   pull_request:
-    paths:
-      - $TARGET_DIR
-
-
+    branches: [ "main" ]
 
 jobs:
   test:

@@ -10,6 +10,7 @@ on:
   pull_request:
     branches: [ "main" ]
     paths: ['${{ env.TARGET_DIR }}/**']
+  workflow_dispatch:
 
 jobs:
   build:
@@ -18,6 +19,10 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+      - run: echo ${{ env.TARGET_DIR }}
+        shell: bash
+      - run: tree
+        shell: bash
       - name: Run Cargo Test
         uses: ./.github/workflows/templates/cargo-test
         with:

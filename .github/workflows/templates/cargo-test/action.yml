@@ -6,9 +6,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
     - name: Set up Rust
       uses: actions-rs/toolchain@v1
       with:
@@ -17,4 +14,4 @@ runs:
 
     - name: Run tests
       shell: bash
-      run: cargo test --verbose $TARGET_DIR
+      run: cargo test --verbose ${{ inputs.target-dir }}

@@ -17,7 +17,9 @@ file(GLOB TEST_SOURCES tests/*.c)
 file(GLOB SRC_MAIN src/main.c)
 list(REMOVE_ITEM SOURCES ${SRC_MAIN})
 
-add_executable(tests ${SOURCES} ${TEST_SOURCES})
+add_executable(tests ${SOURCES} ${TEST_SOURCES}
+        tests/string_utils_tests.c
+        tests/string_utils_tests.h)
 target_include_directories(tests PRIVATE include)
 
 add_subdirectory(vendor/Unity)

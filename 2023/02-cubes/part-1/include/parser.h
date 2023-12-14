@@ -1,2 +1,11 @@
 #pragma once
-void parse(void);
+
+typedef struct {
+    unsigned short id;
+    unsigned short blue;
+    unsigned short red;
+    unsigned short green;
+} GameResult;
+
+GameResult* parseAllGames(const char* inputData);
+

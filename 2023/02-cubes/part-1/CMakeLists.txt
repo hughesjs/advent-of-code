@@ -4,21 +4,20 @@ project(cube_conundrum_part_1)
 set(CMAKE_CXX_STANDARD 17)
 
 # Main exe
-add_executable(cube_conundrum
-        src/main.c
-        src/parser.c
-        src/logicker.c)
+file(GLOB SOURCES src/*.c)
+add_executable(cube_conundrum ${SOURCES})
 
 target_include_directories(cube_conundrum PUBLIC include)
 
 
 # Test exe
-add_executable(tests
-        src/parser.c
-        src/logicker.c
-        #vendor/Unity/src/unity.c
-        tests/tests.c
-        )
+file(GLOB TEST_SOURCES tests/*.c)
+
+# Remove main.c from src
+file(GLOB SRC_MAIN src/main.c)
+list(REMOVE_ITEM SOURCES ${SRC_MAIN})
+
+add_executable(tests ${SOURCES} ${TEST_SOURCES})
 target_include_directories(tests PRIVATE include)
 
 add_subdirectory(vendor/Unity)

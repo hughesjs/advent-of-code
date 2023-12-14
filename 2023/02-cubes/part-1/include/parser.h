@@ -2,6 +2,7 @@
 
 #define GAME_ID_MAX_LEN 3
 #define GAME_ID_NUM_START_INDEX 5
+#define GAME_ID_PREFIX_MAX_LEN GAME_ID_MAX_LEN + GAME_ID_NUM_START_INDEX + 2 // Colon and a space
 
 typedef struct {
     unsigned short game_id;

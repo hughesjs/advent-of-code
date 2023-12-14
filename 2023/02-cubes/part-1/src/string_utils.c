@@ -25,6 +25,15 @@ char** splitString(const char* sourceString, const char* delimiter, int* countOu
     return substrings;
 }
 
+int atoiSubstring(const char* sourceString, const int startIndex, const int endIndex) {
+    const unsigned int numChars = endIndex - startIndex + 1;
+    char* newBuf = malloc(sizeof(char) * numChars);
+    memcpy(newBuf, sourceString + sizeof(char) * startIndex, numChars);
+    const int val = atoi(newBuf);
+    free(newBuf);
+    return val;
+}
+
 
 void freeStrings(char** strings, int count) {
     for (int i = 0; i < count; ++i) {

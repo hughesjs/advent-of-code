@@ -1,11 +1,14 @@
 #include <stdlib.h>
 #include "parser.h"
+
+#include <stdbool.h>
+#include <string.h>
+
 #include "string_utils.h"
 
 
-
 unsigned short getGameId(const char* line) {
-    char* idBuf = malloc(sizeof(char*) * GAME_ID_MAX_LEN);
+    char* idBuf = malloc(sizeof(char *) * GAME_ID_MAX_LEN);
 
     for (int i = 0; i < GAME_ID_MAX_LEN; ++i) {
         const int j = GAME_ID_NUM_START_INDEX + i;
@@ -19,9 +22,80 @@ unsigned short getGameId(const char* line) {
     return atoi(idBuf);
 }
 
+char* extractDataPortionFromGameLine(const char* line) {
+    unsigned int dataStartIndex = 0;
+    for (unsigned short i = GAME_ID_NUM_START_INDEX; i < GAME_ID_PREFIX_MAX_LEN; ++i) {
+        if (line[i] == ' ') {
+            dataStartIndex = i + 1;
+            break;
+        }
+    }
+
+    const unsigned int substringLength = strlen(line) - dataStartIndex;
+    char* gameDataSubstring = malloc(substringLength);
+    memcpy(gameDataSubstring, line + sizeof(char) * dataStartIndex, substringLength);
+    return gameDataSubstring;
+}
+
+bool isNumeric(const char* character) {
+    return *character > 47 && *character < 58;
+}
+
 // "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green"
 void parseSingleGameLine(const char* line, GameResult* destination) {
-    unsigned short id = getGameId(line);
+    destination->game_id = getGameId(line);
+    destination->red_max = 0;
+    destination->green_max = 0;
+    destination->blue_max = 0;
+
+    const char* dataSubstring = extractDataPortionFromGameLine(line);
+    int rounds;
+    char** roundSubstrings = splitString(dataSubstring, ";", &rounds);
+    for (int i = 0; i < rounds; ++i) {
+        const char* round = roundSubstrings[i];
+        int numReveals;
+        char** reveals = splitString(round, ",", &numReveals);
+        for (int j = 0; j < numReveals; ++j) {
+            const char* revealSubstring = reveals[j];
+            int firstDigitIndex = 0;
+            int lastDigitIndex = 0;
+            for (int k = 0; k < strlen(revealSubstring); ++k) {
+                char carat = revealSubstring[k];
+                if (carat == ' ' && !firstDigitIndex) {
+                    continue;
+                }
+
+                if (isNumeric(&carat)) {
+                    if (!firstDigitIndex) {
+                        firstDigitIndex = k;
+                    }
+                    lastDigitIndex = k;
+                    continue;
+                }
+
+                if (carat == 'r') {
+                    const unsigned int r = atoiSubstring(revealSubstring, firstDigitIndex, lastDigitIndex);
+                    if (r > destination->red_max) {
+                        destination->red_max = r;
+                    }
+                }
+
+                if (carat == 'g') {
+                    const unsigned int g = atoiSubstring(revealSubstring, firstDigitIndex, lastDigitIndex);
+                    if (g > destination->green_max) {
+                        destination->green_max = g;
+                    }
+                }
+
+                if (carat == 'b') {
+                    const unsigned int b = atoiSubstring(revealSubstring, firstDigitIndex, lastDigitIndex);
+                    if (b > destination->blue_max) {
+                        destination->blue_max = b;
+                    }
+                }
+            }
+        }
+    }
 }
 
 GameResult* parseLinesToGames(const char** lines, const int numLines) {
@@ -41,6 +115,3 @@ GameResult* parseAllGames(const char* inputData) {
     freeStrings(gameLines, numParts);
     return games;
 }
-
-
-

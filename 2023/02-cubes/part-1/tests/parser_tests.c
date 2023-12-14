@@ -6,7 +6,7 @@
 #include "parser.h"
 
 void can_parse_simple_single_line(void) {
-    const char* testData = "Game 122: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green";
+    const char* testData = "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green";
 
     const GameResult* result = parseAllGames(testData);
 
@@ -18,7 +18,7 @@ void can_parse_simple_single_line(void) {
 
 void can_parse_every_game_id_in_range(void) {
     for (int i = 1; i <= 100; ++i) {
-        char* idStringBuf = malloc(sizeof(char) * (GAME_ID_MAX_LEN + GAME_ID_NUM_START_INDEX));
+        char* idStringBuf = malloc(sizeof(char) * (GAME_ID_PREFIX_MAX_LEN));
         sprintf(idStringBuf, "Game %d:", i);
 
         const unsigned short res = getGameId(idStringBuf);

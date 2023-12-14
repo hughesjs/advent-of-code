@@ -1,18 +1,23 @@
-name: Cargo Test
+name: Cargo Build and Test
 inputs:
-  target-dir:
+  target_dir:
     description: 'Folder to run action against'
     required: true
 runs:
   using: "composite"
   steps:
-    - name: Set up Rust
+    - name: Set Up Rust
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
         override: true
 
+    - name: Build
+      shell: bash
+      working-directory: ${{ inputs.target_dir }}
+      run: cargo build --verbose
+
     - name: Run tests
       shell: bash
-      working-directory: ${{ inputs.target-dir }}
+      working-directory: ${{ inputs.target_dir }}
       run: cargo test --verbose

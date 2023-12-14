@@ -7,6 +7,8 @@ on:
   pull_request:
     paths:
       - '2023/01-trebuchet/part-2/**'
+      - '.github/workflows/templates/cargo-test/**'
+      - '.github/workflows/1-2-trebuchet.yml'
   workflow_dispatch:
 
 jobs:
@@ -20,4 +22,12 @@ jobs:
       - name: Run Cargo Test
         uses: ./.github/workflows/templates/cargo-test
         with:
-          target-dir: ${{ env.TARGET_DIR }}
+          target_dir: ${{ env.TARGET_DIR }}
+
+      - name: Check Final Answer
+        uses: ./.github/workflows/templates/final-answer
+        with:
+          target_dir: ${{ env.TARGET_DIR }}
+          executable: ./target/debug/trebuchet
+          input_data: ./input-data
+          expected_result: "Answer: 53539"

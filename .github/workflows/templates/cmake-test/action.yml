@@ -1,6 +1,6 @@
 name: CMake Test
 inputs:
-  target-dir:
+  target_dir:
     description: 'Folder to run action against'
     required: true
 runs:
@@ -8,11 +8,11 @@ runs:
   steps:
     - name: Configure CMake
       shell: bash
-      run: cmake -B ${{github.workspace}}/build ${{ inputs.target-dir }}
+      run: cmake -B ${{ inputs.target_dir }}/build ${{ inputs.target_dir }}
     - name: Build
       shell: bash
-      run: cmake --build ${{github.workspace}}/build
+      run: cmake --build ${{ inputs.target_dir }}/build
     - name: Test
       shell: bash
-      working-directory: ${{ github.workspace }}/build
+      working-directory: ${{ inputs.target_dir }}/build
       run: ctest

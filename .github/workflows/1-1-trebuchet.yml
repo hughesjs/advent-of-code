@@ -1,12 +1,12 @@
 name: Test Rust Projects
 
 env:
-  TARGET_DIR: './2023/1-1-trebuchet'
+  TARGET_DIR: './2023/01-trebuchet/part-1'
 
 on:
   pull_request:
     paths:
-      - '2023/1-1-trebuchet/**'
+      - '2023/01-trebuchet/part-1/**'
   workflow_dispatch:
 
 jobs:

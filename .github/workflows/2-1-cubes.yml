@@ -1,0 +1,25 @@
+name: Test C Projects
+
+env:
+  TARGET_DIR: './2023/02-cubes/part-1'
+
+on:
+  pull_request:
+    paths:
+      - '2023/02-cubes/part-1/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: 'Build and Test'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Run C Test
+        uses: ./.github/workflows/templates/cmake-test
+        with:
+          target-dir: ${{ env.TARGET_DIR }}

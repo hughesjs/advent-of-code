@@ -31,6 +31,6 @@ jobs:
         uses: ./.github/workflows/templates/final-answer
         with:
           target_dir: ${{ env.TARGET_DIR }}
-          executable: ${{ github.workspace }}/build/cube_conundrum
+          executable: ./build/cube_conundrum
           input_data: ./input-data
           expected_result: "Answer: 2528"

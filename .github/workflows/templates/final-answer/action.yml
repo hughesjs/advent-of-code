@@ -15,6 +15,10 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Debug
+      working-directory: ${{ env.target_dir }}
+      shell: bash
+      run: pwd && tree
     - name: Check Final Answer
       shell: bash
       working-directory: ${{ env.target_dir }}

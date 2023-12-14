@@ -2,7 +2,7 @@ name: Test Cubes Part 1
 
 env:
   TARGET_DIR: './2023/02-cubes/part-1'
-  ANSWER: 2528
+  ANSWER: '2528'
 
 on:
   pull_request:
@@ -27,5 +27,7 @@ jobs:
 
       - name: Check Final Answer
         shell: bash
-        run: "${{github.workspace}}/build/cube_conundrum ${{ inputs.target-dir }}/input-data | awk '/Answer: ${{ env.ANSWER }}/{found=1; exit} END{exit !found}'"
+        run: | 
+          ${{github.workspace}}/build/cube_conundrum ${{ inputs.target-dir }}/input-data
+          ${{github.workspace}}/build/cube_conundrum ${{ inputs.target-dir }}/input-data | awk '/Answer: ${{ env.ANSWER }}/{found=1; exit} END{exit !found}'
 

@@ -11,7 +11,7 @@ typedef struct {
     unsigned short green_max;
 } GameResult;
 
-GameResult* parseAllGames(const char* inputData);
+GameResult* parseAllGames(const char* inputData, int* outNumGames);
 
 // Lazy for testing
 unsigned short getGameId(const char* line);

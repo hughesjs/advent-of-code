@@ -12,7 +12,7 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green)";
 
     const int expected = 8;
 
-    const int answer = deduceAnswer(testData);
+    const int answer = deduceAnswer(testData, 12, 13, 14);
 
     TEST_ASSERT_EQUAL_INT(expected, answer);
 }

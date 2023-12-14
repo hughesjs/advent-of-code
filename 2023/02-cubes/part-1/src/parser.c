@@ -41,6 +41,46 @@ bool isNumeric(const char* character) {
     return *character > 47 && *character < 58;
 }
 
+void processRevealSubstring(const char* revealSubstring, unsigned short* rMax, unsigned short* gMax, unsigned short* bMax) {
+    int firstDigitIndex = 0;
+    int lastDigitIndex = 0;
+    for (int k = 0; k < strlen(revealSubstring); ++k) {
+        char carat = revealSubstring[k];
+        if (carat == ' ' && !firstDigitIndex) {
+            continue;
+        }
+
+        if (isNumeric(&carat)) {
+            if (!firstDigitIndex) {
+                firstDigitIndex = k;
+            }
+            lastDigitIndex = k;
+            continue;
+        }
+
+        if (carat == 'r') {
+            const unsigned int r = atoiSubstring(revealSubstring, firstDigitIndex, lastDigitIndex);
+            if (r > *rMax) {
+                *rMax = r;
+            }
+        }
+
+        if (carat == 'g') {
+            const unsigned int g = atoiSubstring(revealSubstring, firstDigitIndex, lastDigitIndex);
+            if (g > *gMax) {
+                *gMax = g;
+            }
+        }
+
+        if (carat == 'b') {
+            const unsigned int b = atoiSubstring(revealSubstring, firstDigitIndex, lastDigitIndex);
+            if (b > *bMax) {
+                *bMax = b;
+            }
+        }
+    }
+}
+
 // "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green"
 void parseSingleGameLine(const char* line, GameResult* destination) {
     destination->game_id = getGameId(line);
@@ -56,44 +96,10 @@ void parseSingleGameLine(const char* line, GameResult* destination) {
         int numReveals;
         char** reveals = splitString(round, ",", &numReveals);
         for (int j = 0; j < numReveals; ++j) {
-            const char* revealSubstring = reveals[j];
-            int firstDigitIndex = 0;
-            int lastDigitIndex = 0;
-            for (int k = 0; k < strlen(revealSubstring); ++k) {
-                char carat = revealSubstring[k];
-                if (carat == ' ' && !firstDigitIndex) {
-                    continue;
-                }
-
-                if (isNumeric(&carat)) {
-                    if (!firstDigitIndex) {
-                        firstDigitIndex = k;
-                    }
-                    lastDigitIndex = k;
-                    continue;
-                }
-
-                if (carat == 'r') {
-                    const unsigned int r = atoiSubstring(revealSubstring, firstDigitIndex, lastDigitIndex);
-                    if (r > destination->red_max) {
-                        destination->red_max = r;
-                    }
-                }
-
-                if (carat == 'g') {
-                    const unsigned int g = atoiSubstring(revealSubstring, firstDigitIndex, lastDigitIndex);
-                    if (g > destination->green_max) {
-                        destination->green_max = g;
-                    }
-                }
-
-                if (carat == 'b') {
-                    const unsigned int b = atoiSubstring(revealSubstring, firstDigitIndex, lastDigitIndex);
-                    if (b > destination->blue_max) {
-                        destination->blue_max = b;
-                    }
-                }
-            }
+            processRevealSubstring(reveals[j],
+                &destination->red_max,
+                &destination->green_max,
+                &destination->blue_max);
         }
     }
 }
@@ -106,12 +112,11 @@ GameResult* parseLinesToGames(const char** lines, const int numLines) {
     return results;
 }
 
-GameResult* parseAllGames(const char* inputData) {
+GameResult* parseAllGames(const char* inputData, int* outNumGames) {
     int numParts;
     const char** gameLines = splitString(inputData, "\n", &numParts);
-
     GameResult* games = parseLinesToGames(gameLines, numParts);
-
     freeStrings(gameLines, numParts);
+    *outNumGames = numParts;
     return games;
 }

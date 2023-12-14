@@ -8,6 +8,8 @@ on:
   pull_request:
     paths:
       - '2023/02-cubes/part-1/**'
+      - '.github/workflows/templates/cmake-test/**'
+      - '.github/workflows/1-2-cubes.yml'
   workflow_dispatch:
 
 jobs:

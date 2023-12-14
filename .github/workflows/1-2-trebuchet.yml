@@ -7,6 +7,8 @@ on:
   pull_request:
     paths:
       - '2023/01-trebuchet/part-2/**'
+      - '.github/workflows/templates/cargo-test/**'
+      - '.github/workflows/1-2-trebuchet.yml'
   workflow_dispatch:
 
 jobs:

@@ -16,10 +16,10 @@ runs:
   using: "composite"
   steps:
     - name: Debug
-      working-directory: ${{ env.target_dir }}
+      working-directory: ${{ inputs.target_dir }}
       shell: bash
       run: pwd && tree
     - name: Check Final Answer
       shell: bash
-      working-directory: ${{ env.target_dir }}
+      working-directory: ${{ inputs.target_dir }}
       run: "${{ inputs.executable }} ${{ inputs.input_data }} | awk '/${{ inputs.expected_result }}/{found=1; exit} END{exit !found}'"

@@ -1,0 +1,21 @@
+name: Check Final Answer
+inputs:
+  target_dir:
+    description: 'Folder to run action against'
+    required: true
+  executable:
+    description: 'Executable path (including binary name)'
+    required: true
+  input_data:
+    description: 'Input data file path'
+    required: true
+  expected_result:
+    description: 'Expected final result'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Check Final Answer
+      shell: bash
+      working-directory: ${{ env.TARGET_DIR }}
+      run: "${{ inputs.executable }} ${{ inputs.input_data }} | awk '/${{ inputs.expected_result }}/{found=1; exit} END{exit !found}'"

@@ -23,10 +23,12 @@ jobs:
       - name: Run ctest
         uses: ./.github/workflows/templates/cmake-test
         with:
-          target-dir: ${{ env.TARGET_DIR }}
+          target_dir: ${{ env.TARGET_DIR }}
 
       - name: Check Final Answer
-        shell: bash
-        working-directory: ${{ env.TARGET_DIR }}
-        run: "${{github.workspace}}/build/cube_conundrum ./input-data | awk '/Answer: ${{ env.ANSWER }}/{found=1; exit} END{exit !found}'"
-
+        uses: ./.github/workflows/templates/final-answer
+        with:
+          target_dir: ${{ env.TARGET_DIR }}
+          executable: ${{ github.workspace }}/build/cube_conundrum
+          input_data: ./input-data
+          expected_result: "Answer: 2528"

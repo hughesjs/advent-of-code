@@ -9,7 +9,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let file_path = parse_args(std::env::args())?;
     let data = fs::read_to_string(file_path)?;
     let res = calculate_puzzle(&data)?;
-    print!("Result: {}", res);
+    print!("Answer: {}", res);
     Ok(())
 }
 

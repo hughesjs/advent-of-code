@@ -23,3 +23,11 @@ jobs:
         uses: ./.github/workflows/templates/cargo-test
         with:
           target_dir: ${{ env.TARGET_DIR }}
+
+      - name: Check Final Answer
+        uses: ./.github/workflows/templates/final-answer
+        with:
+          target_dir: ${{ env.TARGET_DIR }}
+          executable: ./target/debug/trebuchet
+          input_data: ./input-data
+          expected_result: "Answer: 53539"

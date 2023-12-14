@@ -7,7 +7,7 @@
 char** splitString(const char* sourceString, const char* delimiter, int* countOut) {
     const int srcLen = strlen(sourceString) + 1; // +1 for null terminator
     char* stringToTokenize = malloc(sizeof(char *) * srcLen);
-    strncpy((char *) stringToTokenize, sourceString, srcLen);
+    strncpy(stringToTokenize, sourceString, srcLen);
 
     char** substrings = malloc(MAX_TOKENS * sizeof(char*));
 
@@ -21,6 +21,7 @@ char** splitString(const char* sourceString, const char* delimiter, int* countOu
         token = strtok(NULL, delimiter);
     }
     *countOut = i;
+    free(stringToTokenize);
     return substrings;
 }
 

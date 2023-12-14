@@ -16,6 +16,3 @@ runs:
       shell: bash
       working-directory: ${{ github.workspace }}/build
       run: ctest
-    - name: Run Final Test
-      shell: bash
-      run: ${{github.workspace}}/build/cube_conundrum ${{ inputs.target-dir }}/input-data

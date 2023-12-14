@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+        with:
+          submodules: true
 
       - name: Run C Test
         uses: ./.github/workflows/templates/cmake-test

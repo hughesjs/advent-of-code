@@ -21,8 +21,18 @@ void source_string_unaffected_after_split(void) {
     TEST_ASSERT_EQUAL_STRING("123;456;789", test_data);
 }
 
+void works_for_zero_splits(void) {
+    const char* test_data = "123";
+    int resCount;
+    const char** results = splitString(test_data, ";", &resCount);
+
+    TEST_ASSERT_EQUAL_INT(1, resCount);
+    TEST_ASSERT_EQUAL_STRING("123", results[0]);
+}
+
 void run_string_tests(void) {
     RUN_TEST(can_split_string);
     RUN_TEST(source_string_unaffected_after_split);
+    RUN_TEST(works_for_zero_splits);
 }
 

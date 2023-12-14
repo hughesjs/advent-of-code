@@ -15,4 +15,4 @@ GameResult* parseAllGames(const char* inputData, int* outNumGames);
 
 // Lazy for testing
 unsigned short getGameId(const char* line);
-
+void processRevealSubstring(const char* revealSubstring, unsigned short* rMax, unsigned short* gMax, unsigned short* bMax);

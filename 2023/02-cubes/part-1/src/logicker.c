@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include "logicker.h"
+
 #include "parser.h"
 
 bool isGamePossible(const GameResult* gameResult, const int totalRed, const int totalGreen, const int totalBlue) {

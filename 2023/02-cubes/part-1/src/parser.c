@@ -44,14 +44,18 @@ bool isNumeric(const char* character) {
 void processRevealSubstring(const char* revealSubstring, unsigned short* rMax, unsigned short* gMax, unsigned short* bMax) {
     int firstDigitIndex = 0;
     int lastDigitIndex = 0;
+    bool justWritten = false;
+    bool firstDigitFound = false;
     for (int k = 0; k < strlen(revealSubstring); ++k) {
         char carat = revealSubstring[k];
-        if (carat == ' ' && !firstDigitIndex) {
+        if (justWritten || (carat == ' ' && !firstDigitIndex)) {
+            justWritten = false;
             continue;
         }
 
         if (isNumeric(&carat)) {
-            if (!firstDigitIndex) {
+            if (!firstDigitFound) {
+                firstDigitFound = true;
                 firstDigitIndex = k;
             }
             lastDigitIndex = k;
@@ -59,24 +63,30 @@ void processRevealSubstring(const char* revealSubstring, unsigned short* rMax, u
         }
 
         if (carat == 'r') {
+            justWritten = true;
             const unsigned int r = atoiSubstring(revealSubstring, firstDigitIndex, lastDigitIndex);
             if (r > *rMax) {
                 *rMax = r;
             }
+            continue;
         }
 
         if (carat == 'g') {
+            justWritten = true;
             const unsigned int g = atoiSubstring(revealSubstring, firstDigitIndex, lastDigitIndex);
             if (g > *gMax) {
                 *gMax = g;
             }
+            continue;
         }
 
         if (carat == 'b') {
+            justWritten = true;
             const unsigned int b = atoiSubstring(revealSubstring, firstDigitIndex, lastDigitIndex);
             if (b > *bMax) {
                 *bMax = b;
             }
+            continue;
         }
     }
 }

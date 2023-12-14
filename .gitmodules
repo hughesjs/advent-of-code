@@ -1,3 +1,6 @@
 [submodule "2023/02-cubes/part-1/vendor/Unity"]
 	path = 2023/02-cubes/part-1/vendor/Unity
 	url = https://github.com/ThrowTheSwitch/Unity.git
+[submodule "2023/02-cubes/part-2/vendor/Unity"]
+	path = 2023/02-cubes/part-2/vendor/Unity
+	url = https://github.com/ThrowTheSwitch/Unity.git

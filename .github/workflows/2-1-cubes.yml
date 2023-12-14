@@ -27,7 +27,6 @@ jobs:
 
       - name: Check Final Answer
         shell: bash
-        run: | 
-          ${{github.workspace}}/build/cube_conundrum ${{ inputs.target-dir }}/input-data
-          ${{github.workspace}}/build/cube_conundrum ${{ inputs.target-dir }}/input-data | awk '/Answer: ${{ env.ANSWER }}/{found=1; exit} END{exit !found}'
+        working-directory: ${{ env.TARGET_DIR }}
+        run: "${{github.workspace}}/build/cube_conundrum ./input-data | awk '/Answer: ${{ env.ANSWER }}/{found=1; exit} END{exit !found}'"
 

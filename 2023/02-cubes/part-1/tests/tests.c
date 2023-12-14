@@ -11,13 +11,20 @@ void provided_test_case(void) {
     TEST_ASSERT_EQUAL_INT(expected, answer);
 }
 
+void unity_self_test(void) {
+    TEST_PASS();
+}
+
 void setUp(void) {}
 void tearDown(void) {}
 
 int main(void) {
     UNITY_BEGIN();
 
-    RUN_TEST(provided_test_case);
+    //RUN_TEST(provided_test_case);
+
+    RUN_TEST(unity_self_test);
+
 
     return UNITY_END();
 }

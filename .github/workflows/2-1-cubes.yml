@@ -18,6 +18,6 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Run Cargo Test
-        uses: ./.github/workflows/templates/cargo-test
+        uses: ./.github/workflows/templates/cmake-test
         with:
           target-dir: ${{ env.TARGET_DIR }}

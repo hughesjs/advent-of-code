@@ -1,6 +1,6 @@
 name: Cargo Test
 inputs:
-  target-dir:
+  target_dir:
     description: 'Folder to run action against'
     required: true
 runs:
@@ -14,5 +14,5 @@ runs:
 
     - name: Run tests
       shell: bash
-      working-directory: ${{ inputs.target-dir }}
+      working-directory: ${{ inputs.target_dir }}
       run: cargo test --verbose

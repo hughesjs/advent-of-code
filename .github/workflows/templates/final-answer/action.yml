@@ -17,5 +17,5 @@ runs:
   steps:
     - name: Check Final Answer
       shell: bash
-      working-directory: ${{ env.TARGET_DIR }}
+      working-directory: ${{ env.target_dir }}
       run: "${{ inputs.executable }} ${{ inputs.input_data }} | awk '/${{ inputs.expected_result }}/{found=1; exit} END{exit !found}'"

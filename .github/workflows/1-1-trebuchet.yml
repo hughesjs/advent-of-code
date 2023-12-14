@@ -1,4 +1,4 @@
-name: Test Rust Projects
+name: Test Trebuchet Part 1
 
 env:
   TARGET_DIR: './2023/01-trebuchet/part-1'

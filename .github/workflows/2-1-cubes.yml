@@ -1,4 +1,4 @@
-name: Test C Projects
+name: Test Cubes Part 1
 
 env:
   TARGET_DIR: './2023/02-cubes/part-1'

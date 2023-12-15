@@ -14,8 +14,6 @@ int deduceAnswer(const char* inputData) {
     int numGames;
     const GameResult* gameResults = parseAllGames(inputData, &numGames);
 
-
-
     unsigned int acc = 0;
     for (int i = 0; i < numGames; ++i) {
         acc += getPower(&gameResults[i]);

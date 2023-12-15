@@ -26,3 +26,11 @@ jobs:
         uses: ./.github/workflows/templates/cmake-test
         with:
           target_dir: ${{ env.TARGET_DIR }}
+
+      - name: Check Final Answer
+        uses: ./.github/workflows/templates/final-answer
+        with:
+          target_dir: ${{ env.TARGET_DIR }}
+          executable: ./build/cube_conundrum
+          input_data: ./input-data
+          expected_result: "Answer: 67363"

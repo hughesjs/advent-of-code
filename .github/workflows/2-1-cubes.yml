@@ -33,4 +33,4 @@ jobs:
           target_dir: ${{ env.TARGET_DIR }}
           executable: ./build/cube_conundrum
           input_data: ./input-data
-          expected_result: "Answer: 2528"
+          expected_result: "Answer: ${{ env.ANSWER }}"

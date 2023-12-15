@@ -20,7 +20,7 @@ int main(const int argc, const char** argv) {
     char* fileContents = malloc(fileStatBuf.st_size + 1);
     fread(fileContents, fileStatBuf.st_size, fileStatBuf.st_size, file);
     fclose(file);
-    const int answer = deduceAnswer(fileContents, 12, 13, 14);
+    const int answer = deduceAnswer(fileContents);
     printf("Answer: %d", answer);
 
     free(fileContents);

@@ -32,8 +32,8 @@ char* extractDataPortionFromGameLine(const char* line) {
     }
 
     const unsigned int substringLength = strlen(line) - dataStartIndex;
-    char* gameDataSubstring = malloc(substringLength);
-    memcpy(gameDataSubstring, line + sizeof(char) * dataStartIndex, substringLength);
+    char* gameDataSubstring = malloc(substringLength + 1);
+    memcpy(gameDataSubstring, line + sizeof(char) * dataStartIndex, substringLength + 1);
     return gameDataSubstring;
 }
 

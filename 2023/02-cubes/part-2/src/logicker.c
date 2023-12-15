@@ -1,25 +1,20 @@
-#include <stdbool.h>
 #include "logicker.h"
-
 #include "parser.h"
 
-bool isGamePossible(const GameResult* gameResult, const int totalRed, const int totalGreen, const int totalBlue) {
-    return  gameResult->red_max <= totalRed &&
-           gameResult->blue_max <= totalBlue &&
-           gameResult->green_max <= totalGreen;
+unsigned int getPower(const GameResult* gameResult) {
+    return (int)gameResult->red_max * (int)gameResult->green_max * (int)gameResult->blue_max;
 }
 
-int deduceAnswer(const char* inputData, const int totalRed, const int totalGreen, const int totalBlue) {
+int deduceAnswer(const char* inputData) {
     int numGames;
     const GameResult* gameResults = parseAllGames(inputData, &numGames);
 
-    int acc = 0;
+    unsigned int acc = 0;
     for (int i = 0; i < numGames; ++i) {
-        if (isGamePossible(&gameResults[i], totalRed, totalGreen, totalBlue)) {
-            acc += gameResults[i].game_id;
-        }
+        acc += getPower(&gameResults[i]);
     }
     return acc;
 }
+
 
 

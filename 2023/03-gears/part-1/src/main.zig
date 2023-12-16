@@ -10,10 +10,11 @@ pub fn main() !void {
     const fPath = try get_file_path_from_args();
     defer allocator.free(fPath);
 
-    const engine_schematic = try file_utils.get_file_contents(allocator, fPath);
+    var line_length: usize = undefined;
+    const engine_schematic = try file_utils.get_file_contents_as_single_line(allocator, fPath, &line_length);
     defer allocator.free(engine_schematic);
 
-    const answer = try calculate_answer(engine_schematic);
+    const answer = try calculate_answer(engine_schematic, line_length);
     try output_answer(answer);
 }
 
@@ -23,7 +24,6 @@ fn output_answer(answer: u16) !void {
 }
 
 
-// TODO - Simplify this and use [:0] const
 fn get_file_path_from_args() ![]const u8 {
         const args = try std.process.argsAlloc(allocator);
         defer std.process.argsFree(allocator, args);
@@ -38,12 +38,12 @@ fn get_file_path_from_args() ![]const u8 {
         return pathBuf;
 }
 
-fn calculate_answer(engine_schematic: []const u8) !u16 {
+fn calculate_answer(engine_schematic: []const u8, line_length: usize) !u16 {
     const symbol_mask = try generate_symbol_mask(engine_schematic);
     defer allocator.free(symbol_mask);
 
 
-    std.log.debug("Symbol mask: \n{s}", .{try debug_utils.bool_arr_to_bitfield(allocator, symbol_mask, 10)});
+    std.log.debug("Symbol mask: \n{s}", .{try debug_utils.bool_arr_to_bitfield(allocator, symbol_mask, line_length)});
 
     return 12;
 }

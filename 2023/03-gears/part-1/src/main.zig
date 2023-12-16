@@ -7,6 +7,14 @@ pub fn main() !void {
 
     const engine_schematic = try get_schematic_from_file_path(fPath);
     defer allocator.free(engine_schematic);
+
+    const answer = try calculate_answer(engine_schematic);
+    try output_answer(answer);
+}
+
+fn output_answer(answer: u16) !void {
+    const out = std.io.getStdOut().writer();
+    try out.print("Answer: {d}\n", .{answer});
 }
 
 fn get_schematic_from_file_path(fPath: []const u8) ![]const u8 {
@@ -35,6 +43,11 @@ fn get_file_path_from_args() ![]const u8 {
         return pathBuf;
 }
 
+fn calculate_answer(engine_schematic: []const u8) !u16 {
+    _ = engine_schematic;
+    return 12;
+}
+
 fn get_part_codes(engine_schematic: *[]u8) std.ArrayList([]u8) {
     _ = engine_schematic;
 }
@@ -61,8 +74,9 @@ test "provided_test_case" {
         \\...$.*....
         \\.664.598..
     ;
+    const expected = 4361;
 
-    const res = get_part_codes(testData);
+    const res = calculate_answer(testData);
 
-    try std.testing.expectEqual(testData, res);
+    try std.testing.expectEqual(expected, res);
 }

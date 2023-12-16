@@ -39,38 +39,36 @@ fn get_file_path_from_args() ![]const u8 {
             std.debug.print("Argument: {s}\n", .{arg});
         }
 
-        const pathBuf = try std.mem.Allocator.dupe(allocator, u8, args[1]);
+        const pathBuf = try allocator.dupe(u8, args[1]);
         std.debug.print("fpath: {s}\n", .{pathBuf});
         return pathBuf;
 }
 
 fn calculate_answer(engine_schematic: []const u8) !u16 {
-    const symbol_indices = try get_symbol_indices(engine_schematic);
+    const symbol_mask = try generate_symbol_mask(engine_schematic);
+    defer allocator.free(symbol_mask);
+
 
     std.log.debug("Symbol indices: \n", .{ });
-    for (symbol_indices.items) |i| {
-        std.log.debug("{d}, ", .{i});
+    for (symbol_mask) |i| {
+        std.log.debug("{}, ", .{i});
     }
-
-    defer symbol_indices.deinit();
-
 
     return 12;
 }
 
-fn get_symbol_indices(engine_schematic: []const u8) !ArrayList(usize) {
-    const non_symbol_chars = [_]u8{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' };
-    var list = ArrayList(usize).init(allocator);
-    errdefer list.deinit();
+fn generate_symbol_mask(engine_schematic: []const u8) ![]const bool {
+    const non_symbol_chars = [_]u8{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '\n' };
+    var mask = try allocator.alloc(bool, @sizeOf(u8) * engine_schematic.len);
     for (engine_schematic, 0..) |c, i| {
         if (!array_contains(u8, non_symbol_chars.len,non_symbol_chars, c)) {
-            try list.append(i);
+            mask[i] = true;
         }
     }
-    return list;
+    return mask;
 }
 
-fn array_contains(comptime T: type, comptime N: usize, haystack: [N]T, needle: T) bool {
+fn array_contains(comptime T: type, haystack: []const T, needle: T) bool {
     for (haystack) |e| {
         if (e == needle) {
             return true;
@@ -84,7 +82,7 @@ test "array contains true works" {
     const test_array = [_]u8{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' };
 
     for (test_array) |c| {
-        const found = array_contains(u8, test_array.len, test_array, c);
+        const found = array_contains(u8, &test_array, c);
         try std.testing.expectEqual(true, found);
     }
 }
@@ -93,18 +91,18 @@ test "array contains false works" {
     const test_array = [_]u8{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' };
     const other_array = [_]u8{ 'a', 'b', '#', '/', '_', '=' };
     for (other_array) |c| {
-        const found = array_contains(u8, test_array.len, test_array, c);
+        const found = array_contains(u8, &test_array, c);
         try std.testing.expectEqual(false, found);
     }
 }
 
-test "can get symbol indices for line with no symbols" {
-    const test_data = ".......123....*";
-}
-
-test "can get symbol indices for single line" {
-    const test_data = "*.../..123....*";
-}
+// test "can get symbol indices for line with no symbols" {
+//     const test_data = ".......123....*";
+// }
+//
+// test "can get symbol indices for single line" {
+//     const test_data = "*.../..123....*";
+// }
 
 // test "can get symbol indices for multi line" {
 //

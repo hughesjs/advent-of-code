@@ -1,5 +1,6 @@
 const std = @import("std");
 const allocator = std.heap.page_allocator;
+const ArrayList = std.ArrayList;
 
 pub fn main() !void {
     const fPath = try get_file_path_from_args();
@@ -44,39 +45,92 @@ fn get_file_path_from_args() ![]const u8 {
 }
 
 fn calculate_answer(engine_schematic: []const u8) !u16 {
-    _ = engine_schematic;
+    const symbol_indices = try get_symbol_indices(engine_schematic);
+
+    std.log.debug("Symbol indices: \n", .{ });
+    for (symbol_indices.items) |i| {
+        std.log.debug("{d}, ", .{i});
+    }
+
+    defer symbol_indices.deinit();
+
+
     return 12;
 }
 
-fn get_part_codes(engine_schematic: *[]u8) std.ArrayList([]u8) {
-    _ = engine_schematic;
+fn get_symbol_indices(engine_schematic: []const u8) !ArrayList(usize) {
+    const non_symbol_chars = [_]u8{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' };
+    var list = ArrayList(usize).init(allocator);
+    errdefer list.deinit();
+    for (engine_schematic, 0..) |c, i| {
+        if (!array_contains(u8, non_symbol_chars.len,non_symbol_chars, c)) {
+            try list.append(i);
+        }
+    }
+    return list;
+}
+
+fn array_contains(comptime T: type, comptime N: usize, haystack: [N]T, needle: T) bool {
+    for (haystack) |e| {
+        if (e == needle) {
+            return true;
+        }
+    }
+    return false;
 }
 
 
-test "simple test" {
-    var list = std.ArrayList(i32).init(std.testing.allocator);
-    defer list.deinit(); // try commenting this out and see if zig detects the memory leak!
-    try list.append(42);
+test "array contains true works" {
+    const test_array = [_]u8{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' };
 
-    try std.testing.expectEqual(@as(i32, 42), list.pop());
+    for (test_array) |c| {
+        const found = array_contains(u8, test_array.len, test_array, c);
+        try std.testing.expectEqual(true, found);
+    }
 }
 
-test "provided_test_case" {
-    const testData =
-        \\467..114..
-        \\...*......
-        \\..35..633.
-        \\......#...
-        \\617*......
-        \\.....+.58.
-        \\..592.....
-        \\......755.
-        \\...$.*....
-        \\.664.598..
-    ;
-    const expected = 4361;
-
-    const res = calculate_answer(testData);
-
-    try std.testing.expectEqual(expected, res);
+test "array contains false works" {
+    const test_array = [_]u8{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' };
+    const other_array = [_]u8{ 'a', 'b', '#', '/', '_', '=' };
+    for (other_array) |c| {
+        const found = array_contains(u8, test_array.len, test_array, c);
+        try std.testing.expectEqual(false, found);
+    }
 }
+
+test "can get symbol indices for line with no symbols" {
+    const test_data = ".......123....*";
+}
+
+test "can get symbol indices for single line" {
+    const test_data = "*.../..123....*";
+}
+
+// test "can get symbol indices for multi line" {
+//
+// }
+//
+// test "array contains false works" {
+//     const test_array = [_]u8{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' };
+//
+// }
+
+// test "provided_test_case" {
+//     const testData =
+//         \\467..114..
+//         \\...*......
+//         \\..35..633.
+//         \\......#...
+//         \\617*......
+//         \\.....+.58.
+//         \\..592.....
+//         \\......755.
+//         \\...$.*....
+//         \\.664.598..
+//     ;
+//     const expected: u16 = 4361;
+//
+//     const res = try calculate_answer(testData);
+//
+//     try std.testing.expectEqual(expected, res);
+// }

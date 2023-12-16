@@ -1,12 +1,16 @@
 const std = @import("std");
-const allocator = std.heap.page_allocator;
+pub const array_utils = @import("./array_utils.zig");
+pub const file_utils = @import("./file_utils.zig");
+pub const debug_utils = @import("./debug_utils.zig");
+
 const ArrayList = std.ArrayList;
+const allocator = std.heap.page_allocator;
 
 pub fn main() !void {
     const fPath = try get_file_path_from_args();
     defer allocator.free(fPath);
 
-    const engine_schematic = try get_schematic_from_file_path(fPath);
+    const engine_schematic = try file_utils.get_file_contents(allocator, fPath);
     defer allocator.free(engine_schematic);
 
     const answer = try calculate_answer(engine_schematic);
@@ -18,18 +22,8 @@ fn output_answer(answer: u16) !void {
     try out.print("Answer: {d}\n", .{answer});
 }
 
-fn get_schematic_from_file_path(fPath: []const u8) ![]const u8 {
-    const input_data_file = try std.fs.cwd().openFile(fPath, .{ });
-    defer input_data_file.close();
 
-    const file_size = try input_data_file.getEndPos();
-    std.log.debug("File Size: {d}", .{file_size});
-
-    const buffer: []u8 = try input_data_file.readToEndAlloc(allocator, file_size);
-    std.log.debug("Schematic:\n{s}", .{buffer});
-    return buffer;
-}
-
+// TODO - Simplify this and use [:0] const
 fn get_file_path_from_args() ![]const u8 {
         const args = try std.process.argsAlloc(allocator);
         defer std.process.argsFree(allocator, args);
@@ -49,52 +43,27 @@ fn calculate_answer(engine_schematic: []const u8) !u16 {
     defer allocator.free(symbol_mask);
 
 
-    std.log.debug("Symbol indices: \n", .{ });
-    for (symbol_mask) |i| {
-        std.log.debug("{}, ", .{i});
-    }
+    std.log.debug("Symbol mask: \n{s}", .{try debug_utils.bool_arr_to_bitfield(allocator, symbol_mask, 10)});
 
     return 12;
 }
 
 fn generate_symbol_mask(engine_schematic: []const u8) ![]const bool {
     const non_symbol_chars = [_]u8{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '\n' };
-    var mask = try allocator.alloc(bool, @sizeOf(u8) * engine_schematic.len);
-    for (engine_schematic, 0..) |c, i| {
-        if (!array_contains(u8, non_symbol_chars.len,non_symbol_chars, c)) {
-            mask[i] = true;
+    var mask = try allocator.alloc(bool, engine_schematic.len);
+    for (engine_schematic, mask) |c, *m| {
+        if (!array_utils.array_contains(u8, &non_symbol_chars, c)) {
+            m.* = true;
         }
     }
     return mask;
 }
 
-fn array_contains(comptime T: type, haystack: []const T, needle: T) bool {
-    for (haystack) |e| {
-        if (e == needle) {
-            return true;
-        }
-    }
-    return false;
+
+test "Test dependencies" {
+   std.testing.refAllDeclsRecursive(@This());
 }
 
-
-test "array contains true works" {
-    const test_array = [_]u8{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' };
-
-    for (test_array) |c| {
-        const found = array_contains(u8, &test_array, c);
-        try std.testing.expectEqual(true, found);
-    }
-}
-
-test "array contains false works" {
-    const test_array = [_]u8{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' };
-    const other_array = [_]u8{ 'a', 'b', '#', '/', '_', '=' };
-    for (other_array) |c| {
-        const found = array_contains(u8, &test_array, c);
-        try std.testing.expectEqual(false, found);
-    }
-}
 
 // test "can get symbol indices for line with no symbols" {
 //     const test_data = ".......123....*";
@@ -108,10 +77,6 @@ test "array contains false works" {
 //
 // }
 //
-// test "array contains false works" {
-//     const test_array = [_]u8{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' };
-//
-// }
 
 // test "provided_test_case" {
 //     const testData =

@@ -1,12 +1,12 @@
 name: Test Gears Part 1
 
 env:
-  TARGET_DIR: './2023/03-trebuchet/part-1'
+  TARGET_DIR: './2023/03-gears/part-1'
 
 on:
   pull_request:
     paths:
-      - '2023/03-trebuchet/part-1/**'
+      - '2023/03-gears/part-1/**'
       - '.github/workflows/templates/zig-test/**'
       - '.github/workflows/3-1-gears.yml'
   workflow_dispatch:
@@ -28,6 +28,6 @@ jobs:
       #   uses: ./.github/workflows/templates/final-answer
       #   with:
       #     target_dir: ${{ env.TARGET_DIR }}
-      #     executable: ./target/debug/trebuchet
+      #     executable: ./target/debug/gears
       #     input_data: ./input-data
       #     expected_result: "Answer: 55017"

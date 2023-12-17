@@ -28,6 +28,6 @@ jobs:
         uses: ./.github/workflows/templates/final-answer
         with:
          target_dir: ${{ env.TARGET_DIR }}
-         executable: mix run -e "Scratchcards.process_scratchcards_from_file(\"input-data"\)"
+         executable: mix run -e "Scratchcards.process_scratchcards_from_file('input-data')"
          input_data: "" 
          expected_result: "Answer: 25231.0"

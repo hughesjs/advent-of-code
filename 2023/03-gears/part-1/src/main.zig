@@ -72,26 +72,14 @@ fn get_adjacent_indices(slindex: slice_with_index, line_length: usize, buf_len: 
     var index_list = try ArrayList(usize).initCapacity(allocator, max_adjacents);
     errdefer index_list.deinit();
     std.log.debug("Getting adjacents for: {s} @ {d} -> {d}", .{slindex.slice, slindex.index, slindex.index + slindex.slice.len});
+
+    // -% is a wrapping subtraction
     // Top row
-    if (first_index >= line_length + 1) {
-        for ((first_index - (line_length + 1))..(last_index - (line_length - 1))) |i| {
-            if (i < 0 or i > buf_len) {
-                continue;
-            }
-            try index_list.append(i);
+    for ((first_index -% (line_length + 1))..(last_index -% (line_length - 1))) |i| {
+        if (i > buf_len) {
+            continue;
         }
-    }
-    else {
-        std.log.debug("Going down awkward path.\nLast: {d}\nLen: {d}", .{last_index, line_length});
-        // Deal with negative usize
-        if (last_index >= line_length - 1) { // We have at least "some" above the line... This might be removable after wrap is sorted
-                for (0..(last_index - (line_length - 1))) |i| {
-                    if (i < 0 or i > buf_len) {
-                        continue;
-                    }
-                    try index_list.append(i);
-                }
-        }
+        try index_list.append(i);
     }
 
 
@@ -104,7 +92,7 @@ fn get_adjacent_indices(slindex: slice_with_index, line_length: usize, buf_len: 
     }
 
     // Left
-    if (first_index - 1 >= 0) {
+    if (first_index -% 1 >= 0 and first_index -% 1 < buf_len) {
         try index_list.append(first_index - 1);
     }
 

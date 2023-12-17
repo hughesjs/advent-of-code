@@ -124,20 +124,27 @@ fn get_id_code_slices(engine_schematic: []const u8) !ArrayList(slice_with_index)
     var current_end: usize = 0;
     var in_code = false;
     for (engine_schematic, 0..) |c, i| {
-        if (char_utils.char_is_numeric(c)) {
-            if (!in_code) { // First char of code
-                std.log.debug("Start: {d}: {c}", .{i, c});
-                current_start = i;
-                in_code = true;
-            }
-
-            current_end = i;
+        const is_numeric: bool = char_utils.char_is_numeric(c);
+        if (!in_code and !is_numeric) {
             continue;
         }
+        if (!in_code and is_numeric) {
+            std.log.debug("Start: {d}: {c}", .{i, c});
+            current_start = i;
+            current_end = i;
+            in_code = true;
+            continue;
+        }
+
+        if (is_numeric) {
+            continue;
+        }
+
+        current_end = i; // Slice end is exclusive
         std.log.debug("End: {d}: {c}", .{i, c});
         in_code = false;
-        std.log.debug("Slice: {d} -> {d} -- {s}", .{current_start, current_end, engine_schematic[current_start..current_end + 1]});
-        try symbol_list.append(slice_with_index{.slice = engine_schematic[current_start..current_end + 1], .index = current_start});
+        std.log.debug("Slice: {d} -> {d} -- {s}", .{current_start, current_end, engine_schematic[current_start..current_end]});
+        try symbol_list.append(slice_with_index{.slice = engine_schematic[current_start..current_end], .index = current_start});
     }
 
     return symbol_list;

@@ -42,9 +42,12 @@ fn get_file_path_from_args() ![]const u8 {
 }
 
 fn calculate_answer(engine_schematic: []const u8, line_length: usize) !u32 {
-    const symbol_mask = try generate_symbol_mask(engine_schematic);
+    // It would be far more efficient to invert this whole thing to check adjacents of symbols and detect codes
+    // but it's late...
+    var num_symbols: u16 = undefined;
+    const symbol_mask = try generate_symbol_mask(engine_schematic, &num_symbols);
     defer allocator.free(symbol_mask);
-
+    std.log.debug("Num symbols: {d}", .{num_symbols});
     std.log.debug("Symbol mask: \n{s}", .{try debug_utils.bool_arr_to_bitfield(allocator, symbol_mask, line_length)});
 
     const code_slices: ArrayList(slice_with_index) = try get_id_code_slices(engine_schematic);
@@ -55,15 +58,35 @@ fn calculate_answer(engine_schematic: []const u8, line_length: usize) !u32 {
 
     std.log.debug("Data-mask: \n{s}", .{try debug_utils.generate_adjacency_mask(allocator, slindex_adjacents, symbol_mask, line_length)});
 
-    var acc: u32 = 0;
+    // Hugely wasteful, but we have loads of memory
+    var potential_gears = try allocator.alloc(ArrayList(slice_with_index), symbol_mask.len);
+    defer allocator.free(potential_gears);
+    for (0..potential_gears.len) |i| {
+        var new_list: ArrayList(slice_with_index) = try ArrayList(slice_with_index).initCapacity(allocator, 2);
+        potential_gears[i] = new_list;
+    }
+
     for (slindex_adjacents.items) |sa| {
         for (sa.adjacents.items) |a| {
             if (symbol_mask[a]) {
                 std.log.debug("Code {s} Adj to symbol @ {d} ({c})", .{sa.slindex.slice, a, engine_schematic[a]});
-                acc += try std.fmt.parseInt(u16, sa.slindex.slice, 10);
+                try potential_gears[a].append(sa.slindex);
+                // if (potential_gears[a].items.len == 2) {
+                //     std.log.debug("Gear @ [{d}] has 2 partners ({s} and {s})", .{a, potential_gears[a].items[0].slice, potential_gears[a].items[1].slice});
+                // }
             }
         }
-        std.log.debug("acc: {d}", .{acc});
+    }
+
+    var acc: u32 = 0;
+    for (potential_gears, 0..) |pg, i| {
+        if (pg.items.len == 2) {
+            std.log.debug("Gear @ [{d}] has 2 partners ({s} and {s})", .{i, pg.items[0].slice, pg.items[1].slice});
+            const gear_one = try std.fmt.parseInt(u32,  pg.items[0].slice, 10);
+            const gear_two = try std.fmt.parseInt(u32,  pg.items[1].slice, 10);
+            const gear_ratio = gear_one * gear_two;
+            acc += gear_ratio;
+        }
     }
 
     return acc;
@@ -173,13 +196,19 @@ pub const slindex_with_adjacents = struct {
     adjacents: ArrayList(usize)
 };
 
+pub const gear_partners = struct {
+    gear_index: usize,
+    partners: u8
+};
 
-fn generate_symbol_mask(engine_schematic: []const u8) ![]const bool {
-    const non_symbol_chars = [_]u8{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '\n' };
+
+fn generate_symbol_mask(engine_schematic: []const u8, num_symbols: *u16) ![]const bool {
+    num_symbols.* = 0;
     const mask = try allocator.alloc(bool, engine_schematic.len);
     for (engine_schematic, mask) |c, *m| {
-        if (!array_utils.array_contains(u8, &non_symbol_chars, c)) {
+        if (c == '*')  {
             m.* = true;
+            num_symbols.* += 1;
         }
     }
     return mask;
@@ -210,7 +239,7 @@ test "provided_test_case" {
     const stripped_test_data = try string_utils.strip_new_lines(std.testing.allocator, testData);
     defer std.testing.allocator.free(stripped_test_data);
 
-    const expected: u32 = 4361;
+    const expected: u32 = 467835;
 
     const res = try calculate_answer(stripped_test_data, 10);
 

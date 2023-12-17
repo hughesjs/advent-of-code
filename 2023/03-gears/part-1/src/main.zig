@@ -176,7 +176,7 @@ pub const slindex_with_adjacents = struct {
 
 fn generate_symbol_mask(engine_schematic: []const u8) ![]const bool {
     const non_symbol_chars = [_]u8{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '\n' };
-    var mask = try allocator.alloc(bool, engine_schematic.len);
+    const mask = try allocator.alloc(bool, engine_schematic.len);
     for (engine_schematic, mask) |c, *m| {
         if (!array_utils.array_contains(u8, &non_symbol_chars, c)) {
             m.* = true;
@@ -210,7 +210,7 @@ test "provided_test_case" {
     const stripped_test_data = try string_utils.strip_new_lines(std.testing.allocator, testData);
     defer std.testing.allocator.free(stripped_test_data);
 
-    const expected: u16 = 4361;
+    const expected: u32 = 4361;
 
     const res = try calculate_answer(stripped_test_data, 10);
 

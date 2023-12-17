@@ -21,7 +21,7 @@ pub fn main() !void {
     try output_answer(answer);
 }
 
-fn output_answer(answer: u16) !void {
+fn output_answer(answer: u32) !void {
     const out = std.io.getStdOut().writer();
     try out.print("Answer: {d}\n", .{answer});
 }
@@ -41,7 +41,7 @@ fn get_file_path_from_args() ![]const u8 {
         return pathBuf;
 }
 
-fn calculate_answer(engine_schematic: []const u8, line_length: usize) !u16 {
+fn calculate_answer(engine_schematic: []const u8, line_length: usize) !u32 {
     const symbol_mask = try generate_symbol_mask(engine_schematic);
     defer allocator.free(symbol_mask);
 
@@ -55,7 +55,7 @@ fn calculate_answer(engine_schematic: []const u8, line_length: usize) !u16 {
 
     std.log.debug("Data-mask: \n{s}", .{try debug_utils.generate_adjacency_mask(allocator, slindex_adjacents, symbol_mask, line_length)});
 
-    var acc: u16 = 0;
+    var acc: u32 = 0;
     for (slindex_adjacents.items) |sa| {
         for (sa.adjacents.items) |a| {
             if (symbol_mask[a]) {
@@ -63,7 +63,9 @@ fn calculate_answer(engine_schematic: []const u8, line_length: usize) !u16 {
                 acc += try std.fmt.parseInt(u16, sa.slindex.slice, 10);
             }
         }
+        std.log.debug("acc: {d}", .{acc});
     }
+
     return acc;
 }
 

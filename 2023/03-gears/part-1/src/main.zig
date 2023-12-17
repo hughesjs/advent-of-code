@@ -2,6 +2,7 @@ const std = @import("std");
 pub const array_utils = @import("./array_utils.zig");
 pub const file_utils = @import("./file_utils.zig");
 pub const debug_utils = @import("./debug_utils.zig");
+pub const char_utils = @import("./char_utils.zig");
 
 const ArrayList = std.ArrayList;
 const allocator = std.heap.page_allocator;
@@ -42,11 +43,115 @@ fn calculate_answer(engine_schematic: []const u8, line_length: usize) !u16 {
     const symbol_mask = try generate_symbol_mask(engine_schematic);
     defer allocator.free(symbol_mask);
 
-
     std.log.debug("Symbol mask: \n{s}", .{try debug_utils.bool_arr_to_bitfield(allocator, symbol_mask, line_length)});
+
+    const code_slices: ArrayList(slice_with_index) = try get_id_code_slices(engine_schematic);
+    defer code_slices.deinit();
+
+    for (code_slices.items) |cs| {
+        std.log.debug("Code: {s}", .{cs.slice});
+        // const adjacents = try get_adjacent_indices(cs, line_length, engine_schematic.len);
+        // for (adjacents.items) |i| {
+        //     if (symbol_mask[i]) {
+        //         std.log.debug("CODE: {s}", .{cs.slice});
+        //         break;
+        //     }
+        //     std.log.debug("NOT CODE: {s}", .{cs.slice});
+        // }
+    }
 
     return 12;
 }
+
+fn get_adjacent_indices(slindex: slice_with_index, line_length: usize, buf_len: usize) !ArrayList(usize) {
+    // TODO - Deal with wraparound later
+    const first_index = slindex.index;
+    const last_index = slindex.index + slindex.slice.len - 1;
+    const max_adjacents = 2 * slindex.slice.len + 6;
+
+    var index_list = try ArrayList(usize).initCapacity(allocator, max_adjacents);
+    errdefer index_list.deinit();
+
+    // Top row
+    if (first_index >= line_length + 1) {
+        for ((first_index - (line_length + 1))..(last_index - (line_length - 1))) |i| {
+            if (i < 0 or i > buf_len) {
+                continue;
+            }
+            try index_list.append(i);
+        }
+    }
+    else {
+        // Deal with negative usize
+        if (last_index >= line_length - 1) { // We have at least "some" above the line... This might be removable after wrap is sorted
+                for (0..(last_index - (line_length - 1))) |i| {
+                    if (i < 0 or i > buf_len) {
+                        continue;
+                    }
+                    try index_list.append(i);
+                }
+        }
+    }
+
+
+    // Bottom row
+    for ((first_index + (line_length - 1))..(last_index + (line_length + 1))) |i| {
+        if (i >= buf_len) {
+            continue;
+        }
+        try index_list.append(i);
+    }
+
+    // Left
+    if (first_index - 1 >= 0) {
+        try index_list.append(first_index - 1);
+    }
+
+
+    // Right
+    if (last_index < buf_len) {
+       try index_list.append(last_index + 1);
+    }
+
+    return index_list;
+}
+
+fn get_id_code_slices(engine_schematic: []const u8) !ArrayList(slice_with_index) {
+    var symbol_list = ArrayList(slice_with_index).init(allocator);
+    errdefer symbol_list.deinit();
+
+    var current_start: usize = 0;
+    var current_end: usize = 0;
+    var in_code = false;
+    for (engine_schematic, 0..) |c, i| {
+        if (char_utils.char_is_numeric(c)) {
+            if (!in_code) { // First char of code
+                std.log.debug("Start: {d}: {c}", .{i, c});
+                current_start = i;
+                in_code = true;
+            }
+
+            current_end = i;
+            continue;
+        }
+        std.log.debug("End: {d}: {c}", .{i, c});
+        in_code = false;
+        std.log.debug("Slice: {d} -> {d} -- {s}", .{current_start, current_end, engine_schematic[current_start..current_end + 1]});
+        try symbol_list.append(slice_with_index{.slice = engine_schematic[current_start..current_end + 1], .index = current_start});
+    }
+
+    return symbol_list;
+}
+
+const slice_with_index = struct {
+    slice: []const u8,
+    index: usize //Slice start index in outer buffer
+};
+
+const slindex_with_adjacents = struct {
+    slindex: slice_with_index,
+    adjacents: ArrayList(u8)
+};
 
 fn generate_symbol_mask(engine_schematic: []const u8) ![]const bool {
     const non_symbol_chars = [_]u8{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '\n' };
@@ -65,18 +170,7 @@ test "Test dependencies" {
 }
 
 
-// test "can get symbol indices for line with no symbols" {
-//     const test_data = ".......123....*";
-// }
-//
-// test "can get symbol indices for single line" {
-//     const test_data = "*.../..123....*";
-// }
 
-// test "can get symbol indices for multi line" {
-//
-// }
-//
 
 // test "provided_test_case" {
 //     const testData =

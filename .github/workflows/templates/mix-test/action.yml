@@ -1,4 +1,4 @@
-name: Elixir Build and Test
+name: Mix Build and Test
 inputs:
   target_dir:
     description: 'Folder to run action against'

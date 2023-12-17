@@ -24,10 +24,10 @@ jobs:
         with:
           target_dir: ${{ env.TARGET_DIR }}
 
-      # - name: Check Final Answer
-      #   uses: ./.github/workflows/templates/final-answer
-      #   with:
-      #     target_dir: ${{ env.TARGET_DIR }}
-      #     executable: ./target/debug/gears
-      #     input_data: ./input-data
-      #     expected_result: "Answer: 55017"
+      - name: Check Final Answer
+        uses: ./.github/workflows/templates/final-answer
+        with:
+         target_dir: ${{ env.TARGET_DIR }}
+         executable: ./zig-out/bin/gears
+         input_data: ./input-data
+         expected_result: "Answer: 520019"

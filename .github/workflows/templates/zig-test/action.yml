@@ -11,7 +11,7 @@ runs:
     - name: Build
       shell: bash
       working-directory: ${{ inputs.target_dir }}
-      run: zig build
+      run: zig build -Doptimize=ReleaseFast
     - name: Run tests
       shell: bash
       working-directory: ${{ inputs.target_dir }}

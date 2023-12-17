@@ -62,7 +62,7 @@ fn calculate_answer(engine_schematic: []const u8, line_length: usize) !u32 {
     var potential_gears = try allocator.alloc(ArrayList(slice_with_index), symbol_mask.len);
     defer allocator.free(potential_gears);
     for (0..potential_gears.len) |i| {
-        var new_list: ArrayList(slice_with_index) = try ArrayList(slice_with_index).initCapacity(allocator, 2);
+        const new_list: ArrayList(slice_with_index) = try ArrayList(slice_with_index).initCapacity(allocator, 2);
         potential_gears[i] = new_list;
     }
 

@@ -13,6 +13,7 @@ pub fn main() !void {
 
     var line_length: usize = undefined;
     const engine_schematic = try file_utils.get_file_contents_as_single_line(allocator, fPath, &line_length);
+    std.log.debug("Line Length: {d}", .{line_length});
     defer allocator.free(engine_schematic);
 
     const answer = try calculate_answer(engine_schematic, line_length);
@@ -49,15 +50,14 @@ fn calculate_answer(engine_schematic: []const u8, line_length: usize) !u16 {
     defer code_slices.deinit();
 
     for (code_slices.items) |cs| {
-        std.log.debug("Code: {s}", .{cs.slice});
-        // const adjacents = try get_adjacent_indices(cs, line_length, engine_schematic.len);
-        // for (adjacents.items) |i| {
-        //     if (symbol_mask[i]) {
-        //         std.log.debug("CODE: {s}", .{cs.slice});
-        //         break;
-        //     }
-        //     std.log.debug("NOT CODE: {s}", .{cs.slice});
-        // }
+        const adjacents = try get_adjacent_indices(cs, line_length, engine_schematic.len);
+        for (adjacents.items) |i| {
+            if (symbol_mask[i]) {
+                std.log.debug("CODE: {s}", .{cs.slice});
+                break;
+            }
+            std.log.debug("NOT CODE: {s}", .{cs.slice});
+        }
     }
 
     return 12;
@@ -71,7 +71,7 @@ fn get_adjacent_indices(slindex: slice_with_index, line_length: usize, buf_len: 
 
     var index_list = try ArrayList(usize).initCapacity(allocator, max_adjacents);
     errdefer index_list.deinit();
-
+    std.log.debug("Getting adjacents for: {s} @ {d} -> {d}", .{slindex.slice, slindex.index, slindex.index + slindex.slice.len});
     // Top row
     if (first_index >= line_length + 1) {
         for ((first_index - (line_length + 1))..(last_index - (line_length - 1))) |i| {
@@ -82,6 +82,7 @@ fn get_adjacent_indices(slindex: slice_with_index, line_length: usize, buf_len: 
         }
     }
     else {
+        std.log.debug("Going down awkward path.\nLast: {d}\nLen: {d}", .{last_index, line_length});
         // Deal with negative usize
         if (last_index >= line_length - 1) { // We have at least "some" above the line... This might be removable after wrap is sorted
                 for (0..(last_index - (line_length - 1))) |i| {
@@ -125,11 +126,13 @@ fn get_id_code_slices(engine_schematic: []const u8) !ArrayList(slice_with_index)
     var in_code = false;
     for (engine_schematic, 0..) |c, i| {
         const is_numeric: bool = char_utils.char_is_numeric(c);
+
+        // Yes, we could do some fewer checks with nesting but this is easier to grok...
         if (!in_code and !is_numeric) {
             continue;
         }
+
         if (!in_code and is_numeric) {
-            std.log.debug("Start: {d}: {c}", .{i, c});
             current_start = i;
             current_end = i;
             in_code = true;
@@ -141,10 +144,10 @@ fn get_id_code_slices(engine_schematic: []const u8) !ArrayList(slice_with_index)
         }
 
         current_end = i; // Slice end is exclusive
-        std.log.debug("End: {d}: {c}", .{i, c});
         in_code = false;
-        std.log.debug("Slice: {d} -> {d} -- {s}", .{current_start, current_end, engine_schematic[current_start..current_end]});
-        try symbol_list.append(slice_with_index{.slice = engine_schematic[current_start..current_end], .index = current_start});
+        const slice = engine_schematic[current_start..current_end];
+        std.log.debug("Slice: {d} -> {d} -- {s}", .{current_start, current_end, slice});
+        try symbol_list.append(slice_with_index{.slice = slice, .index = current_start});
     }
 
     return symbol_list;

@@ -15,7 +15,7 @@ pub fn get_file_contents(allocator: std.mem.Allocator, fPath: []const u8) ![]con
 pub fn get_file_contents_as_single_line(allocator: std.mem.Allocator, fPath: []const u8, line_length_out: *usize ) ![]const u8 {
         const initial_buffer = try get_file_contents(allocator, fPath);
         defer allocator.free(initial_buffer);
-        line_length_out.* = get_line_length(initial_buffer) + 1;
+        line_length_out.* = get_line_length(initial_buffer);
 
         const new_buf = try strip_new_lines(allocator, initial_buffer);
         return new_buf;

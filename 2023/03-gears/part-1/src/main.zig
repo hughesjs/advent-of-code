@@ -49,22 +49,50 @@ fn calculate_answer(engine_schematic: []const u8, line_length: usize) !u16 {
     const code_slices: ArrayList(slice_with_index) = try get_id_code_slices(engine_schematic);
     defer code_slices.deinit();
 
-    for (code_slices.items) |cs| {
-        const adjacents = try get_adjacent_indices(cs, line_length, engine_schematic.len);
-        for (adjacents.items) |i| {
-            if (symbol_mask[i]) {
-                std.log.debug("CODE: {s}", .{cs.slice});
-                break;
+    const slindex_adjacents: ArrayList(slindex_with_adjacents) = try get_all_adjacent_indices(code_slices, line_length, engine_schematic.len);
+    defer slindex_adjacents.deinit();
+
+    std.log.debug("Data-mask: \n{s}", .{try debug_utils.generate_adjacency_mask(allocator, slindex_adjacents, symbol_mask, line_length)});
+
+    var acc: u16 = 0;
+    for (slindex_adjacents.items) |sa| {
+        for (sa.adjacents.items) |a| {
+            if (symbol_mask[a]) {
+                std.log.debug("Code {s} Adj to symbol @ {d} ({c})", .{sa.slindex.slice, a, engine_schematic[a]});
+                acc += try std.fmt.parseInt(u16, sa.slindex.slice, 10);
             }
-            std.log.debug("NOT CODE: {s}", .{cs.slice});
         }
     }
+    return acc;
 
-    return 12;
+    // for (code_slices.items) |cs| {
+    //     const adjacents = try get_adjacent_indices(cs, line_length, engine_schematic.len);
+    //     for (adjacents.items) |i| {
+    //         if (symbol_mask[i]) {
+    //             std.log.debug("CODE: {s}", .{cs.slice});
+    //             break;
+    //         }
+    //     }
+    // }
+
+}
+
+fn get_all_adjacent_indices(slindices: ArrayList(slice_with_index), line_length: usize, buf_len: usize) !ArrayList(slindex_with_adjacents) {
+    var adjacent_list = try ArrayList(slindex_with_adjacents).initCapacity(allocator, slindices.items.len);
+    errdefer adjacent_list.deinit();
+
+    for (slindices.items) |slindex| {
+        try adjacent_list.append(slindex_with_adjacents {
+            .slindex = slindex,
+            .adjacents = try get_adjacent_indices(slindex, line_length, buf_len)
+        });
+    }
+
+    return adjacent_list;
 }
 
 fn get_adjacent_indices(slindex: slice_with_index, line_length: usize, buf_len: usize) !ArrayList(usize) {
-    // TODO - Deal with wraparound later
+    // TODO - Deal with line wrapping later
     const first_index = slindex.index;
     const last_index = slindex.index + slindex.slice.len - 1;
     const max_adjacents = 2 * slindex.slice.len + 6;
@@ -73,9 +101,9 @@ fn get_adjacent_indices(slindex: slice_with_index, line_length: usize, buf_len: 
     errdefer index_list.deinit();
     std.log.debug("Getting adjacents for: {s} @ {d} -> {d}", .{slindex.slice, slindex.index, slindex.index + slindex.slice.len});
 
-    // -% is a wrapping subtraction
+    // -% is a wrapping subtraction (+1s on loops to account for ranges being exclusive on the top)
     // Top row
-    for ((first_index -% (line_length + 1))..(last_index -% (line_length - 1))) |i| {
+    for ((first_index -% (line_length + 1))..(last_index -% (line_length - 1)) + 1) |i| {
         if (i > buf_len) {
             continue;
         }
@@ -84,7 +112,7 @@ fn get_adjacent_indices(slindex: slice_with_index, line_length: usize, buf_len: 
 
 
     // Bottom row
-    for ((first_index + (line_length - 1))..(last_index + (line_length + 1))) |i| {
+    for ((first_index + (line_length - 1))..(last_index + (line_length + 1)) + 1) |i| {
         if (i >= buf_len) {
             continue;
         }
@@ -101,6 +129,8 @@ fn get_adjacent_indices(slindex: slice_with_index, line_length: usize, buf_len: 
     if (last_index < buf_len) {
        try index_list.append(last_index + 1);
     }
+
+    std.log.debug("Adj: {any}", .{index_list});
 
     return index_list;
 }
@@ -141,15 +171,16 @@ fn get_id_code_slices(engine_schematic: []const u8) !ArrayList(slice_with_index)
     return symbol_list;
 }
 
-const slice_with_index = struct {
+pub const slice_with_index = struct {
     slice: []const u8,
     index: usize //Slice start index in outer buffer
 };
 
-const slindex_with_adjacents = struct {
+pub const slindex_with_adjacents = struct {
     slindex: slice_with_index,
-    adjacents: ArrayList(u8)
+    adjacents: ArrayList(usize)
 };
+
 
 fn generate_symbol_mask(engine_schematic: []const u8) ![]const bool {
     const non_symbol_chars = [_]u8{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '\n' };

@@ -3,6 +3,7 @@ pub const array_utils = @import("./array_utils.zig");
 pub const file_utils = @import("./file_utils.zig");
 pub const debug_utils = @import("./debug_utils.zig");
 pub const char_utils = @import("./char_utils.zig");
+pub const string_utils = @import("string_utils.zig");
 
 const ArrayList = std.ArrayList;
 const allocator = std.heap.page_allocator;
@@ -64,17 +65,6 @@ fn calculate_answer(engine_schematic: []const u8, line_length: usize) !u16 {
         }
     }
     return acc;
-
-    // for (code_slices.items) |cs| {
-    //     const adjacents = try get_adjacent_indices(cs, line_length, engine_schematic.len);
-    //     for (adjacents.items) |i| {
-    //         if (symbol_mask[i]) {
-    //             std.log.debug("CODE: {s}", .{cs.slice});
-    //             break;
-    //         }
-    //     }
-    // }
-
 }
 
 fn get_all_adjacent_indices(slindices: ArrayList(slice_with_index), line_length: usize, buf_len: usize) !ArrayList(slindex_with_adjacents) {
@@ -201,22 +191,26 @@ test "Test dependencies" {
 
 
 
-// test "provided_test_case" {
-//     const testData =
-//         \\467..114..
-//         \\...*......
-//         \\..35..633.
-//         \\......#...
-//         \\617*......
-//         \\.....+.58.
-//         \\..592.....
-//         \\......755.
-//         \\...$.*....
-//         \\.664.598..
-//     ;
-//     const expected: u16 = 4361;
-//
-//     const res = try calculate_answer(testData);
-//
-//     try std.testing.expectEqual(expected, res);
-// }
+test "provided_test_case" {
+    const testData =
+        \\467..114..
+        \\...*......
+        \\..35..633.
+        \\......#...
+        \\617*......
+        \\.....+.58.
+        \\..592.....
+        \\......755.
+        \\...$.*....
+        \\.664.598..
+    ;
+
+    const stripped_test_data = try string_utils.strip_new_lines(std.testing.allocator, testData);
+    defer std.testing.allocator.free(stripped_test_data);
+
+    const expected: u16 = 4361;
+
+    const res = try calculate_answer(stripped_test_data, 10);
+
+    try std.testing.expectEqual(expected, res);
+}

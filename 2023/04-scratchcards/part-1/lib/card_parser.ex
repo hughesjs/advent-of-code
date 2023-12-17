@@ -4,7 +4,6 @@ end
 
 defmodule CardParser do
   def parse_card(card_string) do
-    IO.puts("Parsing: #{card_string}")
 
     [card_id_string, data_string] =
       card_string

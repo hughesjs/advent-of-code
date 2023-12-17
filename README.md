@@ -8,4 +8,5 @@ I'm going to attempt to solve as many of these problems as possible in languages
 | --- | --- | --- | --- |
 | 1 | Trebuchet| Rust | 2/2 |
 | 2 | Cubes | C | 2/2 |
-| 3 | Gears | Zig | 2/2 | 
+| 3 | Gears | Zig | 2/2 |
+| 4 | Scratchcards | Elixir | 0/2 | 

@@ -1,0 +1,33 @@
+name: Test Scratchcards Part 1
+
+env:
+  TARGET_DIR: './2023/04-scratchcards/part-1'
+
+on:
+  pull_request:
+    paths:
+      - '2023/04-scratchcards/part-1/**'
+      - '.github/workflows/templates/elixir-test/**'
+      - '.github/workflows/4-1-scratchcards.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: 'Build and Test'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Run Mix Build and Test
+        uses: ./.github/workflows/templates/elixir-test
+        with:
+          target_dir: ${{ env.TARGET_DIR }}
+
+      # - name: Check Final Answer
+      #   uses: ./.github/workflows/templates/final-answer
+      #   with:
+      #    target_dir: ${{ env.TARGET_DIR }}
+      #    executable: ./zig-out/bin/gears
+      #    input_data: ./input-data
+      #    expected_result: "Answer: 75519888"

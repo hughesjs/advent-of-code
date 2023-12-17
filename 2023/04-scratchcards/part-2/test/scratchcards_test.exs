@@ -17,7 +17,7 @@ defmodule ScratchcardsTest do
     |> Enum.reject(&String.trim(&1) == "")
     |> Scratchcards.process_scratchcards()
 
-    assert res == 13
+    assert res == 30
 
   end
 end

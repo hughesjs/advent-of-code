@@ -1,0 +1,33 @@
+name: Test Seeds Part 1
+
+env:
+  TARGET_DIR: './2023/05-seeds/part-1'
+   
+on:
+  pull_request:
+    paths:
+      - '2023/05-seeds/part-1/**'
+      - '.github/workflows/templates/go-test/**'
+      - '.github/workflows/5-1-seeds.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: 'Build and Test'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Run Golang Build and Test
+        uses: ./.github/workflows/templates/go-test
+        with:
+          target_dir: ${{ env.TARGET_DIR }}
+
+#      - name: Check Final Answer
+#       uses: ./.github/workflows/templates/final-answer
+#       with:
+#        target_dir: ${{ env.TARGET_DIR }}
+#        executable: mix run -e "Scratchcards.process_scratchcards_from_file('input-data')"
+#        input_data: "" 
+#        expected_result: "Answer: 25231.0"

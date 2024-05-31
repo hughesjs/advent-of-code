@@ -16,15 +16,15 @@ func main() {
 	fmt.Println("Answer: {}", answer)
 }
 
-func parseData(inputData string) int {
+func parseData(inputData string) int64 {
 	segments := strings.Split(inputData, "\n\n")
 	seeds := parseSeeds(segments[0])
 	rangeMaps := parseRangeMaps(segments[1:])
 	return traverseMaps(seeds, rangeMaps)
 }
 
-func traverseMaps(seeds []int, maps [][]seedMapEntry) int {
-	var smallestDistance = math.MaxInt
+func traverseMaps(seeds []int64, maps [][]seedMapEntry) int64 {
+	var smallestDistance int64 = math.MaxInt64
 	for _, seed := range seeds {
 		fmt.Printf("seed %d -> ", seed)
 		var location = findLocation(seed, maps, 0)
@@ -35,7 +35,7 @@ func traverseMaps(seeds []int, maps [][]seedMapEntry) int {
 	return smallestDistance
 }
 
-func findLocation(currentValue int, maps [][]seedMapEntry, depth int) int {
+func findLocation(currentValue int64, maps [][]seedMapEntry, depth int) int64 {
 	var currentMap = maps[depth]
 	for _, entry := range currentMap {
 		if isInRange(currentValue, entry) {
@@ -51,7 +51,7 @@ func findLocation(currentValue int, maps [][]seedMapEntry, depth int) int {
 	return findLocation(currentValue, maps, depth+1)
 }
 
-func isInRange(value int, mapEntry seedMapEntry) bool {
+func isInRange(value int64, mapEntry seedMapEntry) bool {
 	return (value >= mapEntry.sourceRangeStart) && (value < mapEntry.sourceRangeStart+mapEntry.rangeLength)
 }
 
@@ -80,18 +80,18 @@ func parseMapSeg(seg string) []seedMapEntry {
 	return mapEntries
 }
 
-func stringArrToIntArr(arr []string) []int {
-	var ints []int
+func stringArrToIntArr(arr []string) []int64 {
+	var ints []int64
 
 	for _, val := range arr {
-		num, _ := strconv.ParseInt(val, 10, 32)
-		ints = append(ints, int(num))
+		num, _ := strconv.ParseInt(val, 10, 64)
+		ints = append(ints, int64(num))
 	}
 
 	return ints
 }
 
-func parseSeeds(seedDef string) []int {
+func parseSeeds(seedDef string) []int64 {
 	data := strings.Replace(seedDef, "seeds: ", "", -1)
 	seeds := strings.Split(data, " ")
 	return stringArrToIntArr(seeds)
@@ -106,13 +106,13 @@ func getInputData() string {
 }
 
 type seedMapEntry struct {
-	destRangeStart   int
-	sourceRangeStart int
-	rangeLength      int
+	destRangeStart   int64
+	sourceRangeStart int64
+	rangeLength      int64
 }
 
 const (
-	seedsoil int = iota
+	seedsoil int64 = iota
 	soilfert
 	fertwater
 	waterlight

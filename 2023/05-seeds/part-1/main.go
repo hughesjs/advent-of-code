@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -19,42 +20,39 @@ func parseData(inputData string) int {
 	segments := strings.Split(inputData, "\n\n")
 	seeds := parseSeeds(segments[0])
 	rangeMaps := parseRangeMaps(segments[1:])
-	expandedMaps := expandMaps(rangeMaps)
-	return traverseMaps(seeds, expandedMaps)
+	return traverseMaps(seeds, rangeMaps)
 }
 
-func traverseMaps(seeds []int, maps []map[int]int) int {
-	var lowestLocation int = 1e6
+func traverseMaps(seeds []int, maps [][]seedMapEntry) int {
+	var smallestDistance = math.MaxInt
 	for _, seed := range seeds {
 		fmt.Printf("seed %d -> ", seed)
-		var nextVal int = seed
-		for i, mapEntry := range maps {
-			val, exists := mapEntry[nextVal]
-			if exists {
-				nextVal = val
-			}
-			fmt.Printf("%s %d -> ", mapNames[i], nextVal)
+		var location = findLocation(seed, maps, 0)
+		if location < smallestDistance {
+			smallestDistance = location
 		}
-		if nextVal < lowestLocation {
-			lowestLocation = nextVal
-		}
-		fmt.Println()
 	}
-	return lowestLocation
+	return smallestDistance
 }
 
-func expandMaps(maps [][]seedMapEntry) []map[int]int {
-	expandedMap := make([]map[int]int, len(maps))
-
-	for i, mapEntries := range maps {
-		expandedMap[i] = make(map[int]int)
-		for _, mapEntry := range mapEntries {
-			for k := 0; k < mapEntry.rangeLength; k++ {
-				expandedMap[i][mapEntry.sourceRangeStart+k] = mapEntry.destRangeStart + k
-			}
+func findLocation(currentValue int, maps [][]seedMapEntry, depth int) int {
+	var currentMap = maps[depth]
+	for _, entry := range currentMap {
+		if isInRange(currentValue, entry) {
+			currentValue = currentValue - entry.sourceRangeStart + entry.destRangeStart
+			break
 		}
 	}
-	return expandedMap
+	if depth+1 == len(maps) {
+		fmt.Printf("%s %d\n", mapNames[depth], currentValue)
+		return currentValue
+	}
+	fmt.Printf("%s %d -> ", mapNames[depth], currentValue)
+	return findLocation(currentValue, maps, depth+1)
+}
+
+func isInRange(value int, mapEntry seedMapEntry) bool {
+	return (value >= mapEntry.sourceRangeStart) && (value < mapEntry.sourceRangeStart+mapEntry.rangeLength)
 }
 
 func parseRangeMaps(segments []string) [][]seedMapEntry {

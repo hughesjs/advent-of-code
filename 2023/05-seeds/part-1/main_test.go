@@ -1,7 +1,6 @@
 package main
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -46,22 +45,4 @@ func TestExampleCase(t *testing.T) {
 	expected := int(35)
 	result := parseData(providedCase)
 	assert.Equal(t, expected, result)
-}
-
-func TestMapExpansion(t *testing.T) {
-	const providedCase = `seeds: 79 14 55 13
-
-seed-to-soil map:
-50 98 2
-52 50 48`
-
-	seedSoil := expandMaps(parseRangeMaps(strings.Split(providedCase, "\n\n")[1:]))[0]
-
-	assert.Len(t, seedSoil, 50)
-	assert.Equal(t, seedSoil[50], 52)
-	assert.Equal(t, seedSoil[51], 53)
-	assert.Equal(t, seedSoil[96], 98)
-	assert.Equal(t, seedSoil[97], 99)
-	assert.Equal(t, seedSoil[98], 50)
-	assert.Equal(t, seedSoil[99], 51)
 }

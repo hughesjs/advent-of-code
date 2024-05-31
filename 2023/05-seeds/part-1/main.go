@@ -8,12 +8,10 @@ import (
 	"strings"
 )
 
-var mapNames = []string{"soil", "fert", "water", "light", "temp", "humidity", "location"}
-
 func main() {
 	inputData := getInputData()
 	answer := parseData(inputData)
-	fmt.Println("Answer: {}", answer)
+	fmt.Printf("Answer: %d", answer)
 }
 
 func parseData(inputData string) int64 {
@@ -26,7 +24,7 @@ func parseData(inputData string) int64 {
 func traverseMaps(seeds []int64, maps [][]seedMapEntry) int64 {
 	var smallestDistance int64 = math.MaxInt64
 	for _, seed := range seeds {
-		fmt.Printf("seed %d -> ", seed)
+		//fmt.Printf("seed %d -> ", seed)
 		var location = findLocation(seed, maps, 0)
 		if location < smallestDistance {
 			smallestDistance = location
@@ -44,10 +42,10 @@ func findLocation(currentValue int64, maps [][]seedMapEntry, depth int) int64 {
 		}
 	}
 	if depth+1 == len(maps) {
-		fmt.Printf("%s %d\n", mapNames[depth], currentValue)
+		//fmt.Printf("%s %d\n", mapNames[depth], currentValue)
 		return currentValue
 	}
-	fmt.Printf("%s %d -> ", mapNames[depth], currentValue)
+	//fmt.Printf("%s %d -> ", mapNames[depth], currentValue)
 	return findLocation(currentValue, maps, depth+1)
 }
 
@@ -110,13 +108,3 @@ type seedMapEntry struct {
 	sourceRangeStart int64
 	rangeLength      int64
 }
-
-const (
-	seedsoil int64 = iota
-	soilfert
-	fertwater
-	waterlight
-	lighttemp
-	temphumidity
-	humiditylocation
-)

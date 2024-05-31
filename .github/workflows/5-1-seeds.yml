@@ -24,10 +24,10 @@ jobs:
         with:
           target_dir: ${{ env.TARGET_DIR }}
 
-     - name: Check Final Answer
-      uses: ./.github/workflows/templates/final-answer
-      with:
-       target_dir: ${{ env.TARGET_DIR }}
-       executable: go run ${{ env.TARGET_DIR }}/main.go
-       input_data: "${{ env.TARGET_DIR }}/input-data"
-       expected_result: "Answer: 218513636"
+      - name: Check Final Answer
+        uses: ./.github/workflows/templates/final-answer
+        with:
+         target_dir: ${{ env.TARGET_DIR }}
+         executable: go run ${{ env.TARGET_DIR }}/main.go
+         input_data: "${{ env.TARGET_DIR }}/input-data"
+         expected_result: "Answer: 218513636"

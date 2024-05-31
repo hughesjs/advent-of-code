@@ -13,17 +13,33 @@ func main() {
 	fmt.Println("Answer: {}", answer)
 }
 
-func parseData(inputData string) int32 {
+func parseData(inputData string) int {
 	segments := strings.Split(inputData, "\n\n")
 	seeds := parseSeeds(segments[0])
 	fmt.Println(seeds)
-	maps := parseMaps(segments[1:])
-	fmt.Println(maps)
+	rangeMaps := parseRangeMaps(segments[1:])
+	fmt.Println(rangeMaps)
+	expandedMaps := expandMaps(rangeMaps)
+	fmt.Println(expandedMaps)
 	return 0
 }
 
-func parseMaps(segments []string) map[int][]seedMapEntry {
-	maps := make(map[int][]seedMapEntry)
+func expandMaps(maps [][]seedMapEntry) []map[int]int {
+	expandedMap := make([]map[int]int, len(maps))
+
+	for i, mapEntries := range maps {
+		expandedMap[i] = make(map[int]int)
+		for _, mapEntry := range mapEntries {
+			for k := 0; k < mapEntry.rangeLength; k++ {
+				expandedMap[i][mapEntry.sourceRangeStart+k] = mapEntry.destRangeStart + k
+			}
+		}
+	}
+	return expandedMap
+}
+
+func parseRangeMaps(segments []string) [][]seedMapEntry {
+	maps := make([][]seedMapEntry, len(segments))
 	for i, seg := range segments {
 		maps[i] = parseMapSeg(seg)
 	}
@@ -47,18 +63,18 @@ func parseMapSeg(seg string) []seedMapEntry {
 	return mapEntries
 }
 
-func stringArrToIntArr(arr []string) []int32 {
-	var ints []int32
+func stringArrToIntArr(arr []string) []int {
+	var ints []int
 
 	for _, val := range arr {
 		num, _ := strconv.ParseInt(val, 10, 32)
-		ints = append(ints, int32(num))
+		ints = append(ints, int(num))
 	}
 
 	return ints
 }
 
-func parseSeeds(seedDef string) []int32 {
+func parseSeeds(seedDef string) []int {
 	data := strings.Replace(seedDef, "seeds: ", "", -1)
 	seeds := strings.Split(data, " ")
 	return stringArrToIntArr(seeds)
@@ -73,9 +89,9 @@ func getInputData() string {
 }
 
 type seedMapEntry struct {
-	destRangeStart   int32
-	sourceRangeStart int32
-	rangeLength      int32
+	destRangeStart   int
+	sourceRangeStart int
+	rangeLength      int
 }
 
 const (

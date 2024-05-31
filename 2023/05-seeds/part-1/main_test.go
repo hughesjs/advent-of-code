@@ -1,6 +1,5 @@
 package main
 
-
 import (
 	"testing"
 
@@ -43,7 +42,7 @@ humidity-to-location map:
 `
 
 func TestExampleCase(t *testing.T) {
-	expected := int(35)
+	expected := int64(35)
 	result := parseData(providedCase)
 	assert.Equal(t, expected, result)
 }

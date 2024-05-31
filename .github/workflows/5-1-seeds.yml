@@ -24,10 +24,10 @@ jobs:
         with:
           target_dir: ${{ env.TARGET_DIR }}
 
-#      - name: Check Final Answer
-#       uses: ./.github/workflows/templates/final-answer
-#       with:
-#        target_dir: ${{ env.TARGET_DIR }}
-#        executable: mix run -e "Scratchcards.process_scratchcards_from_file('input-data')"
-#        input_data: "" 
-#        expected_result: "Answer: 25231.0"
+      - name: Check Final Answer
+        uses: ./.github/workflows/templates/final-answer
+        with:
+         target_dir: ${{ env.TARGET_DIR }}
+         executable: go run ./main.go
+         input_data: "./input-data"
+         expected_result: "Answer: 218513636"

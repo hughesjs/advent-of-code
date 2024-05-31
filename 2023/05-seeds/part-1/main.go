@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+var mapNames = []string{"soil", "fert", "water", "light", "temp", "humidity", "location"}
+
 func main() {
 	inputData := getInputData()
 	answer := parseData(inputData)
@@ -16,12 +18,29 @@ func main() {
 func parseData(inputData string) int {
 	segments := strings.Split(inputData, "\n\n")
 	seeds := parseSeeds(segments[0])
-	fmt.Println(seeds)
 	rangeMaps := parseRangeMaps(segments[1:])
-	fmt.Println(rangeMaps)
 	expandedMaps := expandMaps(rangeMaps)
-	fmt.Println(expandedMaps)
-	return 0
+	return traverseMaps(seeds, expandedMaps)
+}
+
+func traverseMaps(seeds []int, maps []map[int]int) int {
+	var lowestLocation int = 1e6
+	for _, seed := range seeds {
+		fmt.Printf("seed %d -> ", seed)
+		var nextVal int = seed
+		for i, mapEntry := range maps {
+			val, exists := mapEntry[nextVal]
+			if exists {
+				nextVal = val
+			}
+			fmt.Printf("%s %d -> ", mapNames[i], nextVal)
+		}
+		if nextVal < lowestLocation {
+			lowestLocation = nextVal
+		}
+		fmt.Println()
+	}
+	return lowestLocation
 }
 
 func expandMaps(maps [][]seedMapEntry) []map[int]int {

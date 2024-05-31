@@ -28,6 +28,6 @@ jobs:
         uses: ./.github/workflows/templates/final-answer
         with:
          target_dir: ${{ env.TARGET_DIR }}
-         executable: go run ${{ env.TARGET_DIR }}/main.go
-         input_data: "${{ env.TARGET_DIR }}/input-data"
+         executable: go run ./main.go
+         input_data: "./input-data"
          expected_result: "Answer: 218513636"

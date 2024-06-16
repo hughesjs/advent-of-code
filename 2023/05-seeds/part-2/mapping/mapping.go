@@ -38,20 +38,14 @@ func getDestinationRanges(startRange common.SeedRange, apply common.SeedMap) []c
 		// Whole of range in map
 		if IsInRange(startRange.Start, entry.SourceRange) &&
 			IsInRange(startRange.End, entry.SourceRange) {
-			offset := startRange.Start - entry.SourceRange.Start
-			length := startRange.End - startRange.Start
-			destinationRange := common.SeedRange{Start: entry.DestRangeStart + offset, End: entry.DestRangeStart + offset + length}
-			return []common.SeedRange{destinationRange}
+			return []common.SeedRange{MapSubRangeToDestination(startRange, entry)}
 		}
 
 		// Start of range in the map
 		if IsInRange(startRange.Start, entry.SourceRange) &&
 			!IsInRange(startRange.End, entry.SourceRange) {
 			subRangeInMap := common.SeedRange{Start: startRange.Start, End: entry.SourceRange.End}
-			offset := subRangeInMap.Start - entry.SourceRange.Start
-			length := startRange.End - startRange.Start
-			destinationRange := common.SeedRange{Start: entry.DestRangeStart + offset, End: entry.DestRangeStart + offset + length}
-			destinationRanges = append(destinationRanges, destinationRange)
+			destinationRanges = append(destinationRanges, MapSubRangeToDestination(subRangeInMap, entry))
 
 			subRangeOutOfMap := common.SeedRange{Start: entry.SourceRange.End, End: startRange.End}
 			destinationRanges = slices.Concat(destinationRanges, getDestinationRanges(subRangeOutOfMap, apply))
@@ -62,10 +56,7 @@ func getDestinationRanges(startRange common.SeedRange, apply common.SeedMap) []c
 		if !IsInRange(startRange.Start, entry.SourceRange) &&
 			IsInRange(startRange.End, entry.SourceRange) {
 			subRangeInMap := common.SeedRange{Start: entry.SourceRange.Start, End: startRange.End}
-			offset := subRangeInMap.Start - entry.SourceRange.Start
-			length := startRange.End - startRange.Start
-			destinationRange := common.SeedRange{Start: entry.DestRangeStart + offset, End: entry.DestRangeStart + offset + length}
-			destinationRanges = append(destinationRanges, destinationRange)
+			destinationRanges = append(destinationRanges, MapSubRangeToDestination(subRangeInMap, entry))
 
 			subRangeOutOfMap := common.SeedRange{Start: startRange.Start, End: entry.SourceRange.Start}
 			destinationRanges = slices.Concat(destinationRanges, getDestinationRanges(subRangeOutOfMap, apply))
@@ -76,10 +67,7 @@ func getDestinationRanges(startRange common.SeedRange, apply common.SeedMap) []c
 		if startRange.Start < entry.SourceRange.Start &&
 			startRange.End > entry.SourceRange.End {
 			subRangeInMap := common.SeedRange{Start: entry.SourceRange.Start, End: entry.SourceRange.End}
-			offset := subRangeInMap.Start - entry.SourceRange.Start
-			length := startRange.End - startRange.Start
-			destinationRange := common.SeedRange{Start: entry.DestRangeStart + offset, End: entry.DestRangeStart + offset + length}
-			destinationRanges = append(destinationRanges, destinationRange)
+			destinationRanges = append(destinationRanges, MapSubRangeToDestination(subRangeInMap, entry))
 
 			subRangeBeforeMap := common.SeedRange{Start: startRange.Start, End: entry.SourceRange.Start}
 			destinationRanges = slices.Concat(destinationRanges, getDestinationRanges(subRangeBeforeMap, apply))
@@ -94,6 +82,16 @@ func getDestinationRanges(startRange common.SeedRange, apply common.SeedMap) []c
 
 	// No matches
 	return []common.SeedRange{startRange}
+}
+
+func MapSubRangeToDestination(subRange common.SeedRange, entry common.SeedMapEntry) common.SeedRange {
+	if !(IsInRange(subRange.Start, entry.SourceRange) && subRange.End <= entry.SourceRange.End) {
+		panic("Can't map subrange to destination unless it's in the source range")
+	}
+
+	offset := subRange.Start - entry.SourceRange.Start
+	length := subRange.End - subRange.Start
+	return common.SeedRange{Start: entry.DestRangeStart + offset, End: entry.DestRangeStart + offset + length}
 }
 
 func IsInRange(value int64, sRange common.SeedRange) bool {

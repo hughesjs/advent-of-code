@@ -35,6 +35,8 @@ func getDestinationRanges(startRange common.SeedRange, apply common.SeedMap) []c
 			continue
 		}
 
+		// TODO - These cases are broken
+
 		// Whole of range in map
 		if IsInRange(startRange.Start, entry.SourceRange) &&
 			IsInRange(startRange.End, entry.SourceRange) {

@@ -6,7 +6,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const providedCase = `seeds: 79 14 55 13
+func TestExampleCase(t *testing.T) {
+
+	const providedCase = `seeds: 79 14 55 13
 
 seed-to-soil map:
 50 98 2
@@ -40,9 +42,7 @@ humidity-to-location map:
 60 56 37
 56 93 4
 `
-
-func TestExampleCase(t *testing.T) {
 	expected := int64(35)
-	result := parseData(providedCase)
+	result := runPuzzle(providedCase)
 	assert.Equal(t, expected, result)
 }

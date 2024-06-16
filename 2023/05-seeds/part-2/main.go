@@ -2,17 +2,30 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"os"
+	"seeds/mapping"
 	"seeds/parsing"
 )
 
 func main() {
 	inputData := getInputData()
-	seeds, rangeMaps := parsing.ParsePuzzleDefinition(inputData)
+	answer := runPuzzle(inputData)
+	fmt.Printf("Answer: %d", answer)
+}
 
-	fmt.Print(seeds)
-	fmt.Print(rangeMaps)
-	fmt.Printf("Answer: %d", 0)
+func runPuzzle(inputData string) int64 {
+	seeds, rangeMaps := parsing.ParsePuzzleDefinition(inputData)
+	locationRanges := mapping.GetLocationRanges(seeds, rangeMaps)
+	lowestLocation := int64(math.MaxInt64)
+
+	for _, r := range locationRanges {
+		if r.Start < lowestLocation {
+			lowestLocation = r.Start
+		}
+	}
+
+	return lowestLocation
 }
 
 func getInputData() string {

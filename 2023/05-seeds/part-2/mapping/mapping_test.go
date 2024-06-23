@@ -65,8 +65,8 @@ func TestGetSubrangeWhenAllWithinSearchRange(t *testing.T) {
 
 	before, in, after := GetIntersectionAndRemainder(searchRange, inRange)
 
-	assert.Equal(t, before, common.ZeroSeedRange())
-	assert.Equal(t, after, common.ZeroSeedRange())
+	assert.True(t, before.IsEmpty())
+	assert.True(t, after.IsEmpty())
 	assert.Equal(t, expected, in)
 }
 
@@ -91,13 +91,12 @@ func TestGetSubrangeWhenOverlappingWithStartOfSearchRange(t *testing.T) {
 
 	expectedBefore := common.SeedRange{Start: 0, End: 5}
 	expectedIn := common.SeedRange{Start: 5, End: 7}
-	expectedAfter := common.ZeroSeedRange()
 
 	before, in, after := GetIntersectionAndRemainder(searchRange, inRange)
 
 	assert.Equal(t, expectedBefore, before)
 	assert.Equal(t, expectedIn, in)
-	assert.Equal(t, expectedAfter, after)
+	assert.True(t, after.IsEmpty())
 }
 
 func TestGetSubrangeWhenOverlappingWithEndOfSearchRange(t *testing.T) {

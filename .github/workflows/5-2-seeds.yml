@@ -30,4 +30,4 @@ jobs:
          target_dir: ${{ env.TARGET_DIR }}
          executable: go run ./main.go
          input_data: "./input-data"
-         expected_result: "Answer: 218513636"
+         expected_result: "Answer: 81956384"

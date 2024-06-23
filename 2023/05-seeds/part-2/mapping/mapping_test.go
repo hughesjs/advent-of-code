@@ -54,3 +54,73 @@ func TestMappingWholeRangeInSingleEntry(t *testing.T) {
 	assert.Equal(t, expectedOne, resultOne)
 	assert.Equal(t, expectedTwo, resultTwo)
 }
+
+func TestGetSubrangeWhenNoneWithinSearchRange(t *testing.T) {
+	inRange := common.SeedRange{Start: 0, End: 10}
+	searchRange := common.SeedRange{Start: 10, End: 15}
+
+	before, in, after := GetIntersectionAndRemainder(searchRange, inRange)
+
+	assert.Equal(t, before, common.ZeroSeedRange())
+	assert.Equal(t, in, common.ZeroSeedRange())
+	assert.Equal(t, after, common.ZeroSeedRange())
+}
+
+func TestGetSubrangeWhenAllWithinSearchRange(t *testing.T) {
+	// [0..10)
+	inRange := common.SeedRange{Start: 0, End: 10}
+	searchRange := common.SeedRange{Start: 5, End: 7}
+
+	expected := common.SeedRange{Start: 5, End: 7}
+
+	before, in, after := GetIntersectionAndRemainder(searchRange, inRange)
+
+	assert.Equal(t, before, common.ZeroSeedRange())
+	assert.Equal(t, after, common.ZeroSeedRange())
+	assert.Equal(t, expected, in)
+}
+
+func TestGetSubrangeWhenSubsumesSearchRange(t *testing.T) {
+	inRange := common.SeedRange{Start: 4, End: 7}
+	searchRange := common.SeedRange{Start: 0, End: 10}
+
+	expectedBefore := common.SeedRange{Start: 0, End: 4}
+	expectedIn := common.SeedRange{Start: 4, End: 7}
+	expectedAfter := common.SeedRange{Start: 7, End: 10}
+
+	before, in, after := GetIntersectionAndRemainder(searchRange, inRange)
+
+	assert.Equal(t, expectedBefore, before)
+	assert.Equal(t, expectedIn, in)
+	assert.Equal(t, expectedAfter, after)
+}
+
+func TestGetSubrangeWhenOverlappingWithStartOfSearchRange(t *testing.T) {
+	inRange := common.SeedRange{Start: 5, End: 10}
+	searchRange := common.SeedRange{Start: 0, End: 7}
+
+	expectedBefore := common.SeedRange{Start: 0, End: 5}
+	expectedIn := common.SeedRange{Start: 5, End: 7}
+	expectedAfter := common.ZeroSeedRange()
+
+	before, in, after := GetIntersectionAndRemainder(searchRange, inRange)
+
+	assert.Equal(t, expectedBefore, before)
+	assert.Equal(t, expectedIn, in)
+	assert.Equal(t, expectedAfter, after)
+}
+
+func TestGetSubrangeWhenOverlappingWithEndOfSearchRange(t *testing.T) {
+	inRange := common.SeedRange{Start: 0, End: 7}
+	searchRange := common.SeedRange{Start: 5, End: 10}
+
+	expectedBefore := common.ZeroSeedRange()
+	expectedIn := common.SeedRange{Start: 5, End: 7}
+	expectedAfter := common.SeedRange{Start: 7, End: 10}
+
+	before, in, after := GetIntersectionAndRemainder(searchRange, inRange)
+
+	assert.Equal(t, expectedBefore, before)
+	assert.Equal(t, expectedIn, in)
+	assert.Equal(t, expectedAfter, after)
+}

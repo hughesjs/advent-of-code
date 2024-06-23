@@ -6,25 +6,22 @@ import (
 )
 
 func GetLocationRanges(startRanges []common.SeedRange, maps []common.SeedMap) []common.SeedRange {
-	// TODO - Could recurse here to support arbitrary depth of maps
-	soilRanges := applyMap(startRanges, maps[0])
-	fertilizerRanges := applyMap(soilRanges, maps[1])
-	waterRanges := applyMap(fertilizerRanges, maps[2])
-	lightRanges := applyMap(waterRanges, maps[3])
-	temperatureRanges := applyMap(lightRanges, maps[4])
-	humidityRanges := applyMap(temperatureRanges, maps[5])
-	locationRanges := applyMap(humidityRanges, maps[6])
-
+	locationRanges := applyMap(startRanges, maps, 0)
 	return locationRanges
 }
 
-func applyMap(startRanges []common.SeedRange, mapToApply common.SeedMap) []common.SeedRange {
+func applyMap(startRanges []common.SeedRange, maps []common.SeedMap, depth int) []common.SeedRange {
+	if depth >= len(maps) {
+		return startRanges
+	}
+
 	var newRanges []common.SeedRange
 
 	for _, startRange := range startRanges {
-		newRanges = slices.Concat(newRanges, getDestinationRanges(startRange, mapToApply))
+		newRanges = slices.Concat(newRanges, getDestinationRanges(startRange, maps[depth]))
 	}
-	return newRanges
+
+	return applyMap(newRanges, maps, depth+1)
 }
 
 func getDestinationRanges(startRange common.SeedRange, apply common.SeedMap) []common.SeedRange {

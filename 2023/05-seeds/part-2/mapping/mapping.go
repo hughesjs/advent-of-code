@@ -28,6 +28,12 @@ func applyMap(startRanges []common.SeedRange, mapToApply common.SeedMap) []commo
 }
 
 func getDestinationRanges(startRange common.SeedRange, apply common.SeedMap) []common.SeedRange {
+
+	// Arguably unnecessaru
+	if startRange.IsEmpty() {
+		panic("Start range cannot be empty")
+	}
+
 	var destinationRanges []common.SeedRange
 
 	for _, entry := range apply.Entries {
@@ -38,9 +44,16 @@ func getDestinationRanges(startRange common.SeedRange, apply common.SeedMap) []c
 		}
 
 		destinationRanges = append(destinationRanges, MapSubRangeToDestination(in, entry))
-		destinationRanges = slices.Concat(destinationRanges, getDestinationRanges(before, apply))
-		destinationRanges = slices.Concat(destinationRanges, getDestinationRanges(after, apply))
-		break
+
+		if !before.IsEmpty() {
+			destinationRanges = slices.Concat(destinationRanges, getDestinationRanges(before, apply))
+		}
+
+		if !after.IsEmpty() {
+			destinationRanges = slices.Concat(destinationRanges, getDestinationRanges(after, apply))
+		}
+
+		return destinationRanges
 	}
 
 	// No matches

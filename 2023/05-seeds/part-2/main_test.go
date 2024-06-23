@@ -42,7 +42,7 @@ humidity-to-location map:
 60 56 37
 56 93 4
 `
-	expected := int64(35)
+	expected := int64(46)
 	result := runPuzzle(providedCase)
 	assert.Equal(t, expected, result)
 }

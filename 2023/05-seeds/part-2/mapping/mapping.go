@@ -6,7 +6,7 @@ import (
 )
 
 func GetLocationRanges(startRanges []common.SeedRange, maps []common.SeedMap) []common.SeedRange {
-
+	// TODO - Could recurse here to support arbitrary depth of maps
 	soilRanges := applyMap(startRanges, maps[0])
 	fertilizerRanges := applyMap(soilRanges, maps[1])
 	waterRanges := applyMap(fertilizerRanges, maps[2])
@@ -31,55 +31,16 @@ func getDestinationRanges(startRange common.SeedRange, apply common.SeedMap) []c
 	var destinationRanges []common.SeedRange
 
 	for _, entry := range apply.Entries {
-		if startRange.Start >= entry.SourceRange.End {
+		before, in, after := GetIntersectionAndRemainder(startRange, entry.SourceRange)
+
+		if in.IsEmpty() {
 			continue
 		}
 
-		// TODO - These cases are broken
-
-		// Whole of range in map
-		if IsInRange(startRange.Start, entry.SourceRange) &&
-			IsInRange(startRange.End, entry.SourceRange) {
-			return []common.SeedRange{MapSubRangeToDestination(startRange, entry)}
-		}
-
-		// Start of range in the map
-		if IsInRange(startRange.Start, entry.SourceRange) &&
-			!IsInRange(startRange.End, entry.SourceRange) {
-			subRangeInMap := common.SeedRange{Start: startRange.Start, End: entry.SourceRange.End}
-			destinationRanges = append(destinationRanges, MapSubRangeToDestination(subRangeInMap, entry))
-
-			subRangeOutOfMap := common.SeedRange{Start: entry.SourceRange.End, End: startRange.End}
-			destinationRanges = slices.Concat(destinationRanges, getDestinationRanges(subRangeOutOfMap, apply))
-			return destinationRanges
-		}
-
-		// End of range in the map
-		if !IsInRange(startRange.Start, entry.SourceRange) &&
-			IsInRange(startRange.End, entry.SourceRange) {
-			subRangeInMap := common.SeedRange{Start: entry.SourceRange.Start, End: startRange.End}
-			destinationRanges = append(destinationRanges, MapSubRangeToDestination(subRangeInMap, entry))
-
-			subRangeOutOfMap := common.SeedRange{Start: startRange.Start, End: entry.SourceRange.Start}
-			destinationRanges = slices.Concat(destinationRanges, getDestinationRanges(subRangeOutOfMap, apply))
-			return destinationRanges
-		}
-
-		// Middle of range in the map
-		if startRange.Start < entry.SourceRange.Start &&
-			startRange.End > entry.SourceRange.End {
-			subRangeInMap := common.SeedRange{Start: entry.SourceRange.Start, End: entry.SourceRange.End}
-			destinationRanges = append(destinationRanges, MapSubRangeToDestination(subRangeInMap, entry))
-
-			subRangeBeforeMap := common.SeedRange{Start: startRange.Start, End: entry.SourceRange.Start}
-			destinationRanges = slices.Concat(destinationRanges, getDestinationRanges(subRangeBeforeMap, apply))
-
-			subRangeAfterMap := common.SeedRange{Start: entry.SourceRange.End, End: startRange.End}
-			destinationRanges = slices.Concat(destinationRanges, getDestinationRanges(subRangeAfterMap, apply))
-
-			return destinationRanges
-		}
-
+		destinationRanges = append(destinationRanges, MapSubRangeToDestination(in, entry))
+		destinationRanges = slices.Concat(destinationRanges, getDestinationRanges(before, apply))
+		destinationRanges = slices.Concat(destinationRanges, getDestinationRanges(after, apply))
+		break
 	}
 
 	// No matches
@@ -87,18 +48,13 @@ func getDestinationRanges(startRange common.SeedRange, apply common.SeedMap) []c
 }
 
 func MapSubRangeToDestination(subRange common.SeedRange, entry common.SeedMapEntry) common.SeedRange {
-	if !(IsInRange(subRange.Start, entry.SourceRange) && subRange.End <= entry.SourceRange.End) {
+	if !(entry.SourceRange.ContainsAll(subRange)) {
 		panic("Can't map subrange to destination unless it's in the source range")
 	}
 
 	offset := subRange.Start - entry.SourceRange.Start
 	length := subRange.End - subRange.Start
 	return common.SeedRange{Start: entry.DestRangeStart + offset, End: entry.DestRangeStart + offset + length}
-}
-
-// IsInRange Todo - Delete this and use the below
-func IsInRange(value int64, sRange common.SeedRange) bool {
-	return value >= sRange.Start && value < sRange.End
 }
 
 // GetIntersectionAndRemainder This finds the proportion of a range within another range and returns the coincident portion, the remainder before and the remainder after
@@ -112,7 +68,7 @@ func GetIntersectionAndRemainder(startRange common.SeedRange, inRange common.See
 	}
 
 	// Whole of range in search space
-	if inRange.Contains(startRange.Start) && inRange.Contains(startRange.End) {
+	if inRange.ContainsAll(startRange) {
 		return common.ZeroSeedRange(), startRange, common.ZeroSeedRange()
 	}
 

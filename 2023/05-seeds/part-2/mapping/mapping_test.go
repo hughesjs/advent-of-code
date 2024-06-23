@@ -6,16 +6,6 @@ import (
 	"testing"
 )
 
-func TestIsInRange(t *testing.T) {
-	testData := common.SeedRange{Start: 1, End: 10}
-
-	assert.True(t, IsInRange(1, testData))
-	assert.True(t, IsInRange(5, testData))
-	assert.True(t, IsInRange(9, testData))
-	assert.False(t, IsInRange(0, testData))
-	assert.False(t, IsInRange(10, testData))
-}
-
 func TestMapSubRangeToDestination(t *testing.T) {
 	testEntry := common.SeedMapEntry{SourceRange: common.SeedRange{Start: 1, End: 10}, DestRangeStart: 15}
 	testSubRange := common.SeedRange{Start: 5, End: 10}

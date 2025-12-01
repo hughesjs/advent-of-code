@@ -8,7 +8,7 @@ on:
     paths:
       - '2023/03-gears/part-1/**'
       - '.github/workflows/templates/zig-test/**'
-      - '.github/workflows/3-1-gears.yml'
+      - '.github/workflows/2023/3-1-gears.yml'
   workflow_dispatch:
 
 jobs:

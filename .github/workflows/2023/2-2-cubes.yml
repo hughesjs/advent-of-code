@@ -1,14 +1,15 @@
-name: Test Trebuchet Part 2
+name: Test Cubes Part 2
 
 env:
-  TARGET_DIR: './2023/01-trebuchet/part-2'
+  TARGET_DIR: './2023/02-cubes/part-2'
+  ANSWER: '' #TODO
 
 on:
   pull_request:
     paths:
-      - '2023/01-trebuchet/part-2/**'
-      - '.github/workflows/templates/cargo-test/**'
-      - '.github/workflows/1-2-trebuchet.yml'
+      - '2023/02-cubes/part-2/**'
+      - '.github/workflows/templates/cmake-test/**'
+      - '.github/workflows/2023/2-2-cubes.yml'
   workflow_dispatch:
 
 jobs:
@@ -18,9 +19,11 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+        with:
+          submodules: true
 
-      - name: Run Cargo Test
-        uses: ./.github/workflows/templates/cargo-test
+      - name: Run ctest
+        uses: ./.github/workflows/templates/cmake-test
         with:
           target_dir: ${{ env.TARGET_DIR }}
 
@@ -28,6 +31,6 @@ jobs:
         uses: ./.github/workflows/templates/final-answer
         with:
           target_dir: ${{ env.TARGET_DIR }}
-          executable: ./target/debug/trebuchet
+          executable: ./build/cube_conundrum
           input_data: ./input-data
-          expected_result: "Answer: 53539"
+          expected_result: "Answer: ${{ env.ANSWER }}"

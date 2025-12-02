@@ -1,14 +1,14 @@
-name: Test Seeds Part 1
+name: Test Gears Part 1
 
 env:
-  TARGET_DIR: './2023/05-seeds/part-1'
-   
+  TARGET_DIR: './2023/03-gears/part-1'
+
 on:
   pull_request:
     paths:
-      - '2023/05-seeds/part-1/**'
-      - '.github/workflows/templates/go-test/**'
-      - '.github/workflows/5-1-seeds.yml'
+      - '2023/03-gears/part-1/**'
+      - '.github/workflows/templates/zig-test/**'
+      - '.github/workflows/2023-3-1-gears.yml'
   workflow_dispatch:
 
 jobs:
@@ -19,8 +19,8 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Run Golang Build and Test
-        uses: ./.github/workflows/templates/go-test
+      - name: Run Zig Build and Test
+        uses: ./.github/workflows/templates/zig-test
         with:
           target_dir: ${{ env.TARGET_DIR }}
 
@@ -28,6 +28,6 @@ jobs:
         uses: ./.github/workflows/templates/final-answer
         with:
          target_dir: ${{ env.TARGET_DIR }}
-         executable: go run ./main.go
-         input_data: "./input-data"
-         expected_result: "Answer: 218513636"
+         executable: ./zig-out/bin/gears
+         input_data: ./input-data
+         expected_result: "Answer: 520019"

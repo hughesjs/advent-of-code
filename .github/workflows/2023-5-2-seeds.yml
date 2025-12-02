@@ -8,7 +8,7 @@ on:
     paths:
       - '2023/05-seeds/part-2/**'
       - '.github/workflows/templates/go-test/**'
-      - '.github/workflows/5-2-seeds.yml'
+      - '.github/workflows/2023-5-2-seeds.yml'
   workflow_dispatch:
 
 jobs:

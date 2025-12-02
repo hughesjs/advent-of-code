@@ -1,14 +1,14 @@
-name: Test Scratchcards Part 1
+name: Test Scratchcards Part 2
 
 env:
-  TARGET_DIR: './2023/04-scratchcards/part-1'
+  TARGET_DIR: './2023/04-scratchcards/part-2'
 
 on:
   pull_request:
     paths:
-      - '2023/04-scratchcards/part-1/**'
+      - '2023/04-scratchcards/part-2/**'
       - '.github/workflows/templates/mix-test/**'
-      - '.github/workflows/4-1-scratchcards.yml'
+      - '.github/workflows/2023-4-2-scratchcards.yml'
   workflow_dispatch:
 
 jobs:
@@ -30,4 +30,4 @@ jobs:
          target_dir: ${{ env.TARGET_DIR }}
          executable: mix run -e "Scratchcards.process_scratchcards_from_file('input-data')"
          input_data: "" 
-         expected_result: "Answer: 25231.0"
+         expected_result: "Answer: 9721255"

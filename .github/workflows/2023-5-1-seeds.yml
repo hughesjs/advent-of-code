@@ -1,14 +1,14 @@
-name: Test Seeds Part 2
+name: Test Seeds Part 1
 
 env:
-  TARGET_DIR: './2023/05-seeds/part-2'
+  TARGET_DIR: './2023/05-seeds/part-1'
    
 on:
   pull_request:
     paths:
-      - '2023/05-seeds/part-2/**'
+      - '2023/05-seeds/part-1/**'
       - '.github/workflows/templates/go-test/**'
-      - '.github/workflows/2023/5-2-seeds.yml'
+      - '.github/workflows/2023-5-1-seeds.yml'
   workflow_dispatch:
 
 jobs:
@@ -30,4 +30,4 @@ jobs:
          target_dir: ${{ env.TARGET_DIR }}
          executable: go run ./main.go
          input_data: "./input-data"
-         expected_result: "Answer: 81956384"
+         expected_result: "Answer: 218513636"
